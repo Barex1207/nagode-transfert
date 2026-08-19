@@ -1,0 +1,226 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum VehicleStatus {
+  ACTIF
+  MAINTENANCE
+  HORS_SERVICE
+}
+
+enum FareType {
+  BUS
+  COLIS
+}
+
+enum SupportCategory {
+  TICKET
+  PARCEL
+  MONEY
+}
+
+enum AdminRole {
+  SUPER_ADMIN
+  EDITOR
+}
+
+model AdminUser {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         AdminRole @default(EDITOR)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model AuditLog {
+  id           String   @id @default(uuid())
+  adminId      String?
+  adminEmail   String
+  action       String
+  resourceType String
+  resourceId   String?
+  metadata     Json?
+  createdAt    DateTime @default(now())
+}
+
+/// Singleton row (id fixed to "main") holding branding & contact info
+model SiteSettings {
+  id                 String   @id @default("main")
+  siteName           String   @default("Nagode Transfert")
+  slogan             String   @default("Voyagez, Envoyez, Transférez en toute sécurité")
+  description        String   @default("")
+  logoUrl            String?
+  primaryColor       String   @default("#6F1AAE")
+  secondaryColor     String   @default("#8A2BE2")
+  phone              String   @default("")
+  whatsapp           String?
+  email              String   @default("")
+  address            String   @default("")
+  facebookUrl        String?
+  instagramUrl       String?
+  twitterUrl         String?
+  heroImageUrl       String?
+  heroUsersLabel      String   @default("+50,000")
+  appStoreUrl        String?
+  playStoreUrl       String?
+  appPreviewImageUrl String?
+  updatedAt          DateTime @updatedAt
+}
+
+model Vehicle {
+  id          String        @id @default(uuid())
+  name        String
+  model       String
+  imageUrl    String?
+  description String        @default("")
+  capacity    Int           @default(0)
+  status      VehicleStatus @default(ACTIF)
+  order       Int           @default(0)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+}
+
+model Agency {
+  id            String     @id @default(uuid())
+  city          String
+  country       String     @default("Togo")
+  countryCode   String     @default("+228")
+  address       String     @default("")
+  openingHours  String     @default("")
+  ticketPhones  String[]   @default([])
+  parcelPhones  String[]   @default([])
+  email         String?
+  mapUrl        String?
+  latitude      Float?
+  longitude     Float?
+  order         Int        @default(0)
+  createdAt     DateTime   @default(now())
+  updatedAt     DateTime   @updatedAt
+  schedules     Schedule[]
+}
+
+model Schedule {
+  id          String   @id @default(uuid())
+  agencyId    String?
+  agency      Agency?  @relation(fields: [agencyId], references: [id], onDelete: SetNull)
+  origin      String
+  destination String
+  times       String[] @default([])
+  frequency   String   @default("Quotidien")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Fare {
+  id          String   @id @default(uuid())
+  type        FareType @default(BUS)
+  origin      String
+  destination String   @default("")
+  price       Int
+  label       String   @default("")
+  description String   @default("")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Destination {
+  id          String   @id @default(uuid())
+  name        String
+  siteLabel   String   @default("")
+  countryCode String
+  imageUrl    String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Service {
+  id          String   @id @default(uuid())
+  title       String
+  description String   @default("")
+  icon        String   @default("Bus")
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SupportNumber {
+  id        String          @id @default(uuid())
+  category  SupportCategory
+  phone     String
+  order     Int             @default(0)
+  createdAt DateTime        @default(now())
+  updatedAt DateTime        @updatedAt
+}
+
+model News {
+  id          String   @id @default(uuid())
+  title       String
+  images      String[] @default([])
+  content     String
+  excerpt     String   @default("")
+  published   Boolean  @default(true)
+  publishedAt DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Suggestion {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ContactMessage {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String   @default("")
+  subject   String   @default("Général")
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model FaqItem {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  category  String   @default("Général")
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String   @id @default(uuid())
+  name      String
+  rating    Int      @default(5)
+  message   String
+  approved  Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model TeamMember {
+  id        String   @id @default(uuid())
+  name      String
+  role      String
+  photoUrl  String?
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
