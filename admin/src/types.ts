@@ -1,5 +1,5 @@
 export type VehicleStatus = 'ACTIF' | 'MAINTENANCE' | 'HORS_SERVICE';
-export type VehicleCategory = 'STANDARD' | 'VIP' | 'PRESTIGE';
+export type VehicleCategory = 'STANDARD' | 'VIP' | 'PRESTIGE' | 'CARGO';
 export type VehicleAmenity =
   | 'CLIMATISATION'
   | 'WIFI'
@@ -9,18 +9,27 @@ export type VehicleAmenity =
   | 'ECRAN'
   | 'BAGAGES'
   | 'COLLATION';
+export type VehicleSeatPlanKey =
+  | 'yutong_c9'
+  | 'yutong_d7'
+  | 'yutong_c12pro_standard'
+  | 'yutong_c12pro_prestige'
+  | 'yutong_v6';
 
 export interface Vehicle {
   id: string;
   name: string;
   model: string;
-  imageUrl: string | null;
+  images: string[];
   description: string;
-  capacity: number;
+  capacity: number | null;
+  cargoCapacityLabel: string | null;
+  unitCount: number | null;
   status: VehicleStatus;
   category: VehicleCategory;
   amenities: VehicleAmenity[];
   routes: string[];
+  seatPlanKey: VehicleSeatPlanKey | null;
   order: number;
   createdAt: string;
   updatedAt: string;

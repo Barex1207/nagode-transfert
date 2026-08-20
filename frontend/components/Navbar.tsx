@@ -72,9 +72,9 @@ const Navbar: React.FC = () => {
             <NavLink to="/actualites" className={navLinkClass}>
               Actualités
             </NavLink>
-            <Link to="/#flotte-section" className="transition-colors tracking-wide uppercase text-xs text-white/60 hover:text-white">
+            <NavLink to="/flotte" className={navLinkClass}>
               Notre Flotte
-            </Link>
+            </NavLink>
             <NavLink to="/agences" className={navLinkClass}>
               Nos Agences
             </NavLink>
@@ -130,7 +130,7 @@ const Navbar: React.FC = () => {
             <Link to="/actualites" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
               Actualités
             </Link>
-            <Link to="/#flotte-section" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left">
+            <Link to="/flotte" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left">
               <Bus size={20} />
               <span>Notre Flotte</span>
             </Link>

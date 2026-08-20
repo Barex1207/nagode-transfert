@@ -17,6 +17,7 @@ enum VehicleCategory {
   STANDARD
   VIP
   PRESTIGE
+  CARGO
 }
 
 enum FareType {
@@ -82,19 +83,26 @@ model SiteSettings {
 }
 
 model Vehicle {
-  id          String          @id @default(uuid())
-  name        String
-  model       String
-  imageUrl    String?
-  description String          @default("")
-  capacity    Int             @default(0)
-  status      VehicleStatus   @default(ACTIF)
-  category    VehicleCategory @default(STANDARD)
-  amenities   String[]        @default([])
-  routes      String[]        @default([])
-  order       Int             @default(0)
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
+  id                 String          @id @default(uuid())
+  name               String
+  model              String
+  images             String[]        @default([])
+  description        String          @default("")
+  /// Passenger capacity. Left null when not confirmed yet — never a guessed number.
+  capacity           Int?
+  /// Freight capacity for cargo vehicles (free text, e.g. "3 tonnes"), since unit varies. Null until confirmed.
+  cargoCapacityLabel String?
+  /// How many units of this model are currently in the fleet. Null until the admin fills it in.
+  unitCount          Int?
+  status             VehicleStatus   @default(ACTIF)
+  category           VehicleCategory @default(STANDARD)
+  amenities          String[]        @default([])
+  routes             String[]        @default([])
+  /// Key selecting a built-in seat plan diagram (e.g. "yutong_c9"). Null = no seat plan available.
+  seatPlanKey        String?
+  order              Int             @default(0)
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
 }
 
 model Agency {

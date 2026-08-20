@@ -28,16 +28,27 @@ export const VEHICLE_AMENITY_KEYS = [
   'COLLATION',
 ] as const;
 
+export const VEHICLE_SEAT_PLAN_KEYS = [
+  'yutong_c9',
+  'yutong_d7',
+  'yutong_c12pro_standard',
+  'yutong_c12pro_prestige',
+  'yutong_v6',
+] as const;
+
 export const vehicleSchema = z.object({
   name: z.string().min(1).max(120),
   model: z.string().min(1).max(120),
-  imageUrl: z.string().url().nullable().optional(),
+  images: z.array(z.string().url()).max(12).optional().default([]),
   description: z.string().max(2000).optional().default(''),
-  capacity: z.coerce.number().int().min(0).max(200).optional().default(0),
+  capacity: z.coerce.number().int().min(0).max(200).nullable().optional(),
+  cargoCapacityLabel: z.string().max(60).nullable().optional(),
+  unitCount: z.coerce.number().int().min(0).max(500).nullable().optional(),
   status: z.enum(['ACTIF', 'MAINTENANCE', 'HORS_SERVICE']).optional().default('ACTIF'),
-  category: z.enum(['STANDARD', 'VIP', 'PRESTIGE']).optional().default('STANDARD'),
+  category: z.enum(['STANDARD', 'VIP', 'PRESTIGE', 'CARGO']).optional().default('STANDARD'),
   amenities: z.array(z.enum(VEHICLE_AMENITY_KEYS)).optional().default([]),
   routes: z.array(z.string().min(1).max(120)).max(20).optional().default([]),
+  seatPlanKey: z.enum(VEHICLE_SEAT_PLAN_KEYS).nullable().optional(),
   order: z.coerce.number().int().optional().default(0),
 });
 

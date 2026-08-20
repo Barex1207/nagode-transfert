@@ -23,6 +23,7 @@ const ThankYou = lazy(() => import('./pages/ThankYou'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Faq = lazy(() => import('./pages/Faq'));
 const Testimonials = lazy(() => import('./pages/Testimonials'));
+const Flotte = lazy(() => import('./pages/Flotte'));
 
 const RouteFallback: React.FC = () => (
   <div className="flex items-center justify-center py-32">
@@ -47,6 +48,7 @@ const App: React.FC = () => {
         <Suspense fallback={<RouteFallback />}>
           <Routes>
             <Route path="/" element={<Home activeBookingTab={activeBookingTab} onTabChange={setActiveBookingTab} />} />
+            <Route path="/flotte" element={<Flotte />} />
             <Route path="/agences" element={<Agencies />} />
             <Route path="/tarifs" element={<Pricing />} />
             <Route path="/horaires" element={<Schedules />} />

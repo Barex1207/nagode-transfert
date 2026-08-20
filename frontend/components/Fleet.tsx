@@ -1,23 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Armchair,
-  ArrowRight,
-  Bus,
-  Coffee,
-  Luggage,
-  MapPin,
-  Snowflake,
-  Toilet,
-  Tv,
-  Usb,
-  Users,
-  Wifi,
-} from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Armchair, ArrowRight, Bus, Snowflake, Users, Wifi } from 'lucide-react';
 import { api } from '../lib/api';
-import { useSettings } from '../context/SettingsContext';
 
 type VehicleStatus = 'ACTIF' | 'MAINTENANCE' | 'HORS_SERVICE';
-type VehicleCategory = 'STANDARD' | 'VIP' | 'PRESTIGE';
+type VehicleCategory = 'STANDARD' | 'VIP' | 'PRESTIGE' | 'CARGO';
 type VehicleAmenity =
   | 'CLIMATISATION'
   | 'WIFI'
@@ -32,13 +19,11 @@ interface Vehicle {
   id: string;
   name: string;
   model: string;
-  imageUrl: string | null;
-  description: string;
-  capacity: number;
+  images: string[];
+  capacity: number | null;
   status: VehicleStatus;
   category: VehicleCategory;
   amenities: VehicleAmenity[];
-  routes: string[];
 }
 
 const STATUS_LABEL: Record<VehicleStatus, string> = {
@@ -53,50 +38,28 @@ const STATUS_DOT: Record<VehicleStatus, string> = {
   HORS_SERVICE: 'bg-red-400',
 };
 
-const AMENITY_LABEL: Record<VehicleAmenity, string> = {
-  CLIMATISATION: 'Climatisation',
-  WIFI: 'Wifi à bord',
-  USB: 'Prises USB',
-  SIEGES_INCLINABLES: 'Sièges inclinables',
-  TOILETTES: 'Toilettes à bord',
-  ECRAN: 'Écran de divertissement',
-  BAGAGES: 'Grand espace bagages',
-  COLLATION: 'Collation offerte',
+const CATEGORY_LABEL: Record<VehicleCategory, string> = {
+  STANDARD: 'Standard',
+  VIP: 'VIP',
+  PRESTIGE: 'Prestige',
+  CARGO: 'Cargo',
 };
 
-const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: number }>> = {
+const AMENITY_ICON: Partial<Record<VehicleAmenity, React.ComponentType<{ size?: number }>>> = {
   CLIMATISATION: Snowflake,
   WIFI: Wifi,
-  USB: Usb,
   SIEGES_INCLINABLES: Armchair,
-  TOILETTES: Toilet,
-  ECRAN: Tv,
-  BAGAGES: Luggage,
-  COLLATION: Coffee,
 };
 
-const CATEGORY_META: Record<VehicleCategory, { label: string; tagline: string }> = {
-  STANDARD: { label: 'Gamme Standard', tagline: "L'essentiel du confort pour vos trajets du quotidien." },
-  VIP: { label: 'Gamme VIP', tagline: 'Plus d’espace et d’équipements pour voyager sereinement.' },
-  PRESTIGE: { label: 'Gamme Prestige', tagline: 'Le meilleur de Nagode Transfert, pour un voyage haut de gamme.' },
-};
-
-const CATEGORY_ORDER: VehicleCategory[] = ['STANDARD', 'VIP', 'PRESTIGE'];
-
-function scrollToBooking(e: React.MouseEvent) {
-  e.preventDefault();
-  document.getElementById('booking-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-}
-
-const VehicleCard: React.FC<{ vehicle: Vehicle; delay: number }> = ({ vehicle, delay }) => (
+const TeaserCard: React.FC<{ vehicle: Vehicle; delay: number }> = ({ vehicle, delay }) => (
   <div
     className="group relative rounded-[2rem] overflow-hidden bg-white shadow-[0_4px_20px_rgb(var(--brand-dark-rgb)/12%)] hover:shadow-[0_12px_32px_rgb(var(--brand-dark-rgb)/22%)] hover:-translate-y-1 transition-all duration-500 animate-in fade-in slide-in-from-bottom-8"
     style={{ animationDelay: `${delay}ms` }}
   >
     <div className="relative aspect-[4/3] bg-gray-100 overflow-hidden">
-      {vehicle.imageUrl ? (
+      {vehicle.images[0] ? (
         <img
-          src={vehicle.imageUrl}
+          src={vehicle.images[0]}
           alt={vehicle.name}
           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         />
@@ -116,8 +79,8 @@ const VehicleCard: React.FC<{ vehicle: Vehicle; delay: number }> = ({ vehicle, d
         {vehicle.name}
       </span>
       <span className="mt-0.5 flex items-center gap-2 text-[11px] font-medium text-white/50 truncate">
-        {vehicle.model}
-        {vehicle.capacity > 0 && (
+        {CATEGORY_LABEL[vehicle.category]}
+        {vehicle.capacity != null && (
           <span className="flex items-center gap-1 shrink-0">
             <Users size={11} />
             {vehicle.capacity}
@@ -129,23 +92,13 @@ const VehicleCard: React.FC<{ vehicle: Vehicle; delay: number }> = ({ vehicle, d
         <div className="mt-3 flex flex-wrap gap-1.5">
           {vehicle.amenities.map((a) => {
             const Icon = AMENITY_ICON[a];
+            if (!Icon) return null;
             return (
-              <span
-                key={a}
-                title={AMENITY_LABEL[a]}
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-white/70"
-              >
+              <span key={a} className="flex h-6 w-6 items-center justify-center rounded-full bg-white/10 text-white/70">
                 <Icon size={12} />
               </span>
             );
           })}
-        </div>
-      )}
-
-      {vehicle.routes.length > 0 && (
-        <div className="mt-3 flex items-start gap-1.5 border-t border-white/10 pt-3 text-[10px] font-medium leading-relaxed text-white/50">
-          <MapPin size={11} className="mt-0.5 shrink-0" />
-          <span className="truncate">{vehicle.routes.join(' · ')}</span>
         </div>
       )}
     </div>
@@ -153,49 +106,18 @@ const VehicleCard: React.FC<{ vehicle: Vehicle; delay: number }> = ({ vehicle, d
 );
 
 const Fleet: React.FC = () => {
-  const settings = useSettings();
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     api
       .get<Vehicle[]>('/vehicles')
-      .then((data) => setVehicles(data.filter((v) => v.status !== 'HORS_SERVICE')))
+      .then((data) => setVehicles(data.filter((v) => v.status !== 'HORS_SERVICE' && v.category !== 'CARGO')))
       .catch(() => setVehicles([]))
       .finally(() => setLoading(false));
   }, []);
 
-  const groups = CATEGORY_ORDER.map((category) => ({
-    category,
-    vehicles: vehicles.filter((v) => v.category === category),
-  })).filter((g) => g.vehicles.length > 0);
-
-  // Kept compact on purpose: a full-size hero-style empty state right after
-  // the Features section would read as a second, near-identical block and
-  // leave a disproportionate gap while no vehicles are published yet.
-  if (groups.length === 0) {
-    return (
-      <section id="flotte-section" className="py-12 bg-brand-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-gray-200 bg-white/70 py-10 px-6 text-center">
-            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-gray-300 shadow-sm">
-              <Bus size={20} />
-            </div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--brand-dark)]">Notre Flotte</p>
-            <h3 className="text-lg font-bold text-gray-900">
-              {loading ? 'Chargement de la flotte…' : 'Le détail de nos bus arrive bientôt'}
-            </h3>
-            {!loading && (
-              <p className="text-sm text-gray-400 max-w-sm">
-                Modèle, capacité, équipements à bord : chaque véhicule Standard, VIP ou Prestige apparaîtra ici dès
-                sa mise en ligne.
-              </p>
-            )}
-          </div>
-        </div>
-      </section>
-    );
-  }
+  const teaser = vehicles.slice(0, 4);
 
   return (
     <section id="flotte-section" className="py-24 bg-brand-light">
@@ -206,44 +128,38 @@ const Fleet: React.FC = () => {
             Des Bus Modernes &amp; Confortables
           </h2>
           <p className="text-lg text-gray-500 max-w-2xl mx-auto font-medium">
-            Standard, VIP ou Prestige : découvrez les véhicules qui composent notre réseau, et ce qui vous attend à
-            bord de chacun.
+            Standard ou Prestige : un aperçu des véhicules qui composent notre réseau.
           </p>
         </div>
 
-        <div className="space-y-16">
-          {groups.map(({ category, vehicles: groupVehicles }) => (
-            <div key={category}>
-              <div className="mb-6 flex items-baseline justify-between gap-4 border-b border-gray-200 pb-3">
-                <h3 className="text-xl font-black text-gray-900 uppercase tracking-tight">
-                  {CATEGORY_META[category].label}
-                </h3>
-                <p className="hidden sm:block text-sm text-gray-400 font-medium">{CATEGORY_META[category].tagline}</p>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {groupVehicles.map((vehicle, idx) => (
-                  <VehicleCard key={vehicle.id} vehicle={vehicle} delay={idx * 100} />
-                ))}
-              </div>
+        {teaser.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-gray-200 bg-white/70 py-10 px-6 text-center">
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-white text-gray-300 shadow-sm">
+              <Bus size={20} />
             </div>
-          ))}
-        </div>
+            <h3 className="text-lg font-bold text-gray-900">
+              {loading ? 'Chargement de la flotte…' : 'Le détail de nos bus arrive bientôt'}
+            </h3>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {teaser.map((vehicle, idx) => (
+              <TeaserCard key={vehicle.id} vehicle={vehicle} delay={idx * 100} />
+            ))}
+          </div>
+        )}
 
         <div className="mt-14 flex flex-col items-center gap-6">
           <div className="w-16 h-1 rounded-full bg-[var(--brand-dark)]" />
-          {settings.slogan && (
-            <p className="text-sm italic text-gray-400 text-center max-w-lg">
-              "{settings.slogan}" — {settings.siteName}
-            </p>
-          )}
-          <a
-            href="#booking-section"
-            onClick={scrollToBooking}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--brand-dark)] text-white text-xs font-black uppercase tracking-widest shadow-[0_4px_20px_rgb(var(--brand-dark-rgb)/30%)] hover:bg-[var(--brand-dark-hover)] hover:scale-105 transition-all"
-          >
-            Réservez votre place
-            <ArrowRight size={16} />
-          </a>
+          <div className="flex flex-wrap justify-center gap-4">
+            <Link
+              to="/flotte"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[var(--brand-dark)] text-white text-xs font-black uppercase tracking-widest shadow-[0_4px_20px_rgb(var(--brand-dark-rgb)/30%)] hover:bg-[var(--brand-dark-hover)] hover:scale-105 transition-all"
+            >
+              Voir toute notre flotte
+              <ArrowRight size={16} />
+            </Link>
+          </div>
         </div>
       </div>
     </section>

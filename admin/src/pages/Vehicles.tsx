@@ -10,18 +10,19 @@ import {
   Snowflake,
   Toilet,
   Trash2,
+  Truck,
   Tv,
   Usb,
   Wifi,
 } from 'lucide-react';
 import { useResource } from '../lib/useResource';
-import type { Vehicle, VehicleAmenity, VehicleCategory, VehicleStatus } from '../types';
+import type { Vehicle, VehicleAmenity, VehicleCategory, VehicleSeatPlanKey, VehicleStatus } from '../types';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { DraggableList } from '../components/ui/DraggableList';
 import { Field, Input, Select, Textarea } from '../components/ui/Field';
-import { ImageUpload } from '../components/ui/ImageUpload';
+import { MultiImageUpload } from '../components/ui/MultiImageUpload';
 import { TagListInput } from '../components/ui/TagListInput';
 import { PageHeader } from '../components/ui/PageHeader';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -44,6 +45,7 @@ const CATEGORY_LABEL: Record<VehicleCategory, string> = {
   STANDARD: 'Standard',
   VIP: 'VIP',
   PRESTIGE: 'Prestige',
+  CARGO: 'Cargo (colis)',
 };
 
 export const AMENITY_LABEL: Record<VehicleAmenity, string> = {
@@ -52,9 +54,9 @@ export const AMENITY_LABEL: Record<VehicleAmenity, string> = {
   USB: 'Prises USB',
   SIEGES_INCLINABLES: 'Sièges inclinables',
   TOILETTES: 'Toilettes à bord',
-  ECRAN: 'Écran de divertissement',
+  ECRAN: 'Écran individuel par siège',
   BAGAGES: 'Grand espace bagages',
-  COLLATION: 'Collation offerte',
+  COLLATION: 'Restauration à bord',
 };
 
 export const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: number }>> = {
@@ -70,20 +72,37 @@ export const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: n
 
 const AMENITY_KEYS = Object.keys(AMENITY_LABEL) as VehicleAmenity[];
 
+const SEAT_PLAN_LABEL: Record<VehicleSeatPlanKey, string> = {
+  yutong_c9: 'Yutong C9',
+  yutong_d7: 'Yutong D7',
+  yutong_c12pro_standard: 'Yutong C12 Pro (Standard)',
+  yutong_c12pro_prestige: 'Yutong C12 Pro (Prestige)',
+  yutong_v6: 'Yutong V6',
+};
+
 type FormState = Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>;
 
 const emptyForm: FormState = {
   name: '',
   model: '',
-  imageUrl: null,
+  images: [],
   description: '',
-  capacity: 0,
+  capacity: null,
+  cargoCapacityLabel: null,
+  unitCount: null,
   status: 'ACTIF',
   category: 'STANDARD',
   amenities: [],
   routes: [],
+  seatPlanKey: null,
   order: 0,
 };
+
+function numberOrNull(value: string): number | null {
+  if (value.trim() === '') return null;
+  const n = Number(value);
+  return Number.isNaN(n) ? null : n;
+}
 
 export default function Vehicles() {
   const { items, loading, error, create, update, remove, reorder } = useResource<Vehicle>('/vehicles');
@@ -156,23 +175,29 @@ export default function Vehicles() {
   );
 
   function renderCard(vehicle: Vehicle) {
+    const isCargo = vehicle.category === 'CARGO';
     return (
       <div className="group overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
         <div className="relative h-36 overflow-hidden bg-surface">
-          {vehicle.imageUrl ? (
+          {vehicle.images[0] ? (
             <img
-              src={vehicle.imageUrl}
+              src={vehicle.images[0]}
               alt={vehicle.name}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-gray-300">
-              <Bus size={28} />
+              {isCargo ? <Truck size={28} /> : <Bus size={28} />}
             </div>
           )}
           <span className="absolute left-2 top-2 rounded-full bg-brand-dark px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white shadow-sm">
             {CATEGORY_LABEL[vehicle.category]}
           </span>
+          {vehicle.images.length > 1 && (
+            <span className="absolute bottom-2 right-2 rounded-full bg-black/60 px-2 py-0.5 text-[10px] font-bold text-white">
+              {vehicle.images.length} photos
+            </span>
+          )}
         </div>
         <div className="p-4">
           <div className="mb-1 flex items-start justify-between gap-2">
@@ -182,7 +207,14 @@ export default function Vehicles() {
             </span>
           </div>
           <p className="text-sm text-gray-500">
-            {vehicle.model} · {vehicle.capacity} places
+            {vehicle.model}
+            {' · '}
+            {isCargo
+              ? vehicle.cargoCapacityLabel || 'Capacité à confirmer'
+              : vehicle.capacity != null
+                ? `${vehicle.capacity} places`
+                : 'Capacité à confirmer'}
+            {vehicle.unitCount != null && ` · ${vehicle.unitCount} unité${vehicle.unitCount > 1 ? 's' : ''}`}
           </p>
           {vehicle.amenities.length > 0 && (
             <div className="mt-2 flex flex-wrap gap-1.5 text-gray-400">
@@ -210,11 +242,13 @@ export default function Vehicles() {
     );
   }
 
+  const isCargoForm = form.category === 'CARGO';
+
   return (
     <div>
       <PageHeader
         title="Flotte / Véhicules"
-        subtitle="Gérez les bus affichés sur la landing page. Glissez une carte pour réordonner."
+        subtitle="Gérez les véhicules affichés sur la landing page et la page Notre Flotte. Glissez une carte pour réordonner."
         action={
           <Button onClick={openCreate}>
             <Plus size={16} />
@@ -245,7 +279,7 @@ export default function Vehicles() {
         <EmptyState
           icon={Bus}
           title={searchQuery ? 'Aucun véhicule ne correspond' : 'Aucun véhicule pour le moment'}
-          message={searchQuery ? 'Essayez un autre nom ou modèle.' : 'Ajoutez votre premier bus pour l’afficher sur le site.'}
+          message={searchQuery ? 'Essayez un autre nom ou modèle.' : 'Ajoutez votre premier véhicule pour l’afficher sur le site.'}
           action={
             !searchQuery && (
               <Button onClick={openCreate}>
@@ -273,8 +307,8 @@ export default function Vehicles() {
       {formOpen && (
         <Modal title={editing ? 'Modifier le véhicule' : 'Ajouter un véhicule'} onClose={() => setFormOpen(false)}>
           <form onSubmit={handleSubmit}>
-            <Field label="Image">
-              <ImageUpload value={form.imageUrl} onChange={(url) => setForm((f) => ({ ...f, imageUrl: url }))} />
+            <Field label="Photos (plusieurs possibles)" hint="La première photo sert de couverture.">
+              <MultiImageUpload value={form.images} onChange={(images) => setForm((f) => ({ ...f, images }))} />
             </Field>
             <Field label="Nom">
               <Input required value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} />
@@ -283,14 +317,6 @@ export default function Vehicles() {
               <Input required value={form.model} onChange={(e) => setForm((f) => ({ ...f, model: e.target.value }))} />
             </Field>
             <div className="grid grid-cols-2 gap-4">
-              <Field label="Capacité (places)">
-                <Input
-                  type="number"
-                  min={0}
-                  value={form.capacity}
-                  onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))}
-                />
-              </Field>
               <Field label="Catégorie">
                 <Select
                   value={form.category}
@@ -303,16 +329,61 @@ export default function Vehicles() {
                   ))}
                 </Select>
               </Field>
+              <Field label="Statut">
+                <Select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as VehicleStatus }))}>
+                  {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
             </div>
-            <Field label="Statut">
-              <Select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as VehicleStatus }))}>
-                {Object.entries(STATUS_LABEL).map(([value, label]) => (
-                  <option key={value} value={value}>
-                    {label}
-                  </option>
-                ))}
-              </Select>
-            </Field>
+
+            <div className="grid grid-cols-2 gap-4">
+              {isCargoForm ? (
+                <Field label="Capacité de chargement" hint="ex : 3 tonnes, 12 m³. Laissez vide si non confirmée.">
+                  <Input
+                    value={form.cargoCapacityLabel ?? ''}
+                    onChange={(e) => setForm((f) => ({ ...f, cargoCapacityLabel: e.target.value || null }))}
+                    placeholder="ex : 3 tonnes"
+                  />
+                </Field>
+              ) : (
+                <Field label="Capacité (places)" hint="Laissez vide si non confirmée — jamais un chiffre approximatif.">
+                  <Input
+                    type="number"
+                    min={0}
+                    value={form.capacity ?? ''}
+                    onChange={(e) => setForm((f) => ({ ...f, capacity: numberOrNull(e.target.value) }))}
+                  />
+                </Field>
+              )}
+              <Field label="Nombre d'unités dans la flotte" hint="Laissez vide si non confirmé.">
+                <Input
+                  type="number"
+                  min={0}
+                  value={form.unitCount ?? ''}
+                  onChange={(e) => setForm((f) => ({ ...f, unitCount: numberOrNull(e.target.value) }))}
+                />
+              </Field>
+            </div>
+
+            {!isCargoForm && (
+              <Field label="Plan des sièges" hint="Détermine le plan affiché sur la page Notre Flotte.">
+                <Select
+                  value={form.seatPlanKey ?? ''}
+                  onChange={(e) => setForm((f) => ({ ...f, seatPlanKey: (e.target.value || null) as VehicleSeatPlanKey | null }))}
+                >
+                  <option value="">Aucun plan</option>
+                  {Object.entries(SEAT_PLAN_LABEL).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </Select>
+              </Field>
+            )}
 
             <Field label="Équipements à bord">
               <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
