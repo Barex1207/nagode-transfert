@@ -39,7 +39,8 @@ export default function Login() {
     <div
       className="animate-gradient-flow flex min-h-screen items-center justify-center px-4"
       style={{
-        background: 'linear-gradient(120deg, #3b0764, #6F1AAE, #8A2BE2, #4c1d95)',
+        backgroundImage: 'linear-gradient(120deg, #3b0764, #6F1AAE, #8A2BE2, #4c1d95)',
+        backgroundSize: '200% 200%',
       }}
     >
       <form
