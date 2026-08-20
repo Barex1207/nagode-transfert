@@ -18,7 +18,7 @@ const BusRental: React.FC<BusRentalProps> = ({ onRequestQuote }) => {
         <div className="relative overflow-hidden rounded-3xl bg-[#07111f] px-8 py-14 md:px-16 md:py-16 text-white">
           <div className="relative z-10 grid md:grid-cols-2 gap-10 items-center">
             <div className="space-y-6">
-              <p className="text-xs font-black uppercase tracking-[0.2em] text-gold">Location de Bus</p>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-[var(--brand-accent)]">Location de Bus</p>
               <h2 className="text-3xl md:text-4xl font-black tracking-tight leading-tight">
                 Un bus VIP pour votre prochain événement
               </h2>
@@ -28,7 +28,7 @@ const BusRental: React.FC<BusRentalProps> = ({ onRequestQuote }) => {
               </p>
               <button
                 onClick={onRequestQuote}
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gold text-white text-xs font-black uppercase tracking-widest shadow-lg hover:opacity-90 hover:scale-105 transition-all"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-[var(--brand-accent)] text-white text-xs font-black uppercase tracking-widest shadow-lg hover:opacity-90 hover:scale-105 transition-all"
               >
                 Demander un devis
                 <ArrowRight size={16} />
@@ -41,7 +41,7 @@ const BusRental: React.FC<BusRentalProps> = ({ onRequestQuote }) => {
                   key={label}
                   className="flex items-center gap-4 rounded-xl bg-white/5 border border-white/10 px-5 py-4"
                 >
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-gold/15 text-gold">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-[rgb(var(--brand-accent-rgb)/15%)] text-[var(--brand-accent)]">
                     <Icon size={20} />
                   </div>
                   <span className="text-sm font-bold text-white/85">{label}</span>

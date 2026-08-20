@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { MapPin, Phone, Search, Clock, ExternalLink, Mail } from 'lucide-react';
 import { api } from '../lib/api';
 import { useDocumentHead } from '../lib/useDocumentHead';
+import AgencyMap from './AgencyMap';
 
 interface Agency {
   id: string;
@@ -15,6 +16,8 @@ interface Agency {
   parcelPhones: string[];
   email: string | null;
   mapUrl: string | null;
+  latitude: number | null;
+  longitude: number | null;
 }
 
 const COUNTRY_FLAG: Record<string, string> = {
@@ -106,6 +109,8 @@ const Agencies: React.FC = () => {
             </div>
           </div>
         )}
+
+        <AgencyMap agencies={filteredAgencies} />
 
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredAgencies.length > 0 ? (
