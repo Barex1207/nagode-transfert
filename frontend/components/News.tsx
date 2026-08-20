@@ -17,15 +17,19 @@ interface NewsItem {
 const NewsGallery: React.FC<{ images: string[]; alt: string }> = ({ images, alt }) => {
   const [index, setIndex] = useState(0);
 
+  useEffect(() => {
+    if (images.length < 2) return;
+    const timer = setInterval(() => {
+      setIndex((i) => (i + 1) % images.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [images.length]);
+
   if (images.length === 0) return null;
 
   return (
-    <div className="relative h-56 overflow-hidden bg-gray-200 group/gallery">
-      <img
-        src={images[index]}
-        alt={alt}
-        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-      />
+    <div className="relative h-56 overflow-hidden bg-gray-100 group/gallery">
+      <img src={images[index]} alt={alt} className="w-full h-full object-contain transition-opacity duration-500" />
       {images.length > 1 && (
         <>
           <button
@@ -119,9 +123,11 @@ const News: React.FC = () => {
                   <h3 className="text-xl font-black text-gray-900 mb-3 group-hover:text-[var(--brand-dark)] transition-colors leading-tight">
                     {item.title}
                   </h3>
-                  <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1">
-                    {item.excerpt || item.content.slice(0, 160)}
-                  </p>
+                  {(item.excerpt || item.content) && (
+                    <p className="text-sm text-gray-500 leading-relaxed mb-6 flex-1 whitespace-pre-line">
+                      {item.excerpt || item.content}
+                    </p>
+                  )}
                   {settings.facebookUrl && (
                     <a
                       href={settings.facebookUrl}

@@ -10,9 +10,11 @@ interface ImageUploadProps {
 export function ImageUpload({ value, onChange }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dragOver, setDragOver] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   async function handleFile(file: File) {
+    if (!file.type.startsWith('image/')) return;
     setUploading(true);
     setError(null);
     try {
@@ -28,8 +30,21 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
   return (
     <div>
       <div
-        className="flex h-32 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 hover:border-brand-primary"
+        className={`flex h-32 w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border-2 border-dashed transition-colors ${
+          dragOver ? 'border-brand-primary bg-brand-primary/5' : 'border-gray-300 bg-gray-50 hover:border-brand-primary'
+        }`}
         onClick={() => inputRef.current?.click()}
+        onDragOver={(e) => {
+          e.preventDefault();
+          setDragOver(true);
+        }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const file = e.dataTransfer.files?.[0];
+          if (file) handleFile(file);
+        }}
       >
         {uploading ? (
           <Loader2 className="animate-spin text-brand-primary" size={24} />
@@ -38,7 +53,7 @@ export function ImageUpload({ value, onChange }: ImageUploadProps) {
         ) : (
           <div className="flex flex-col items-center gap-1 text-gray-400">
             <ImagePlus size={24} />
-            <span className="text-xs">Cliquer pour téléverser une image</span>
+            <span className="text-xs">Cliquer ou glisser-déposer une image</span>
           </div>
         )}
       </div>

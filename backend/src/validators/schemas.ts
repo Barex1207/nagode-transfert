@@ -33,7 +33,7 @@ export const agencySchema = z.object({
 export const newsSchema = z.object({
   title: z.string().min(1).max(200),
   images: z.array(z.string().url()).max(10).optional().default([]),
-  content: z.string().min(1).max(10000),
+  content: z.string().max(10000).optional().default(''),
   excerpt: z.string().max(400).optional().default(''),
   published: z.boolean().optional().default(true),
   publishedAt: z.coerce.date().optional(),
