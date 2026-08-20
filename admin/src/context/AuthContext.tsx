@@ -1,6 +1,6 @@
 import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { api, ApiError } from '../lib/api';
-import type { AdminUser } from '../types';
+import { api, ApiError, setCsrfToken } from '../lib/api';
+import type { AdminUser, AuthResponse } from '../types';
 
 interface AuthContextValue {
   admin: AdminUser | null;
@@ -17,14 +17,18 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     api
-      .get<AdminUser>('/auth/me')
-      .then(setAdmin)
+      .get<AuthResponse>('/auth/me')
+      .then((user) => {
+        setCsrfToken(user.csrfToken);
+        setAdmin(user);
+      })
       .catch(() => setAdmin(null))
       .finally(() => setLoading(false));
   }, []);
 
   const login = useCallback(async (email: string, password: string) => {
-    const user = await api.post<AdminUser>('/auth/login', { email, password });
+    const user = await api.post<AuthResponse>('/auth/login', { email, password });
+    setCsrfToken(user.csrfToken);
     setAdmin(user);
   }, []);
 
@@ -34,6 +38,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     } catch (err) {
       if (!(err instanceof ApiError)) throw err;
     }
+    setCsrfToken(undefined);
     setAdmin(null);
   }, []);
 

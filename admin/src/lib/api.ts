@@ -8,9 +8,19 @@ export class ApiError extends Error {
   }
 }
 
+// The backend lives on a different domain than the admin app, so the browser
+// never exposes its csrf_token cookie to our JS via document.cookie (cookies
+// are only readable by scripts on the domain that set them). The backend
+// therefore hands us the value directly in the /auth/login and /auth/me
+// response bodies, and we keep it here for the lifetime of the session.
+let csrfToken: string | undefined;
+
+export function setCsrfToken(token: string | undefined) {
+  csrfToken = token;
+}
+
 function getCsrfToken(): string | undefined {
-  const match = document.cookie.match(/(?:^|;\s*)csrf_token=([^;]+)/);
-  return match?.[1];
+  return csrfToken;
 }
 
 const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);

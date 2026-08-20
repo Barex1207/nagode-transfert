@@ -54,7 +54,7 @@ export async function login(req: Request, res: Response) {
   res.cookie(COOKIE_NAME, token, cookieOptions());
   res.cookie(CSRF_COOKIE_NAME, csrfToken, csrfCookieOptions());
   await logAudit({ sub: admin.id, email: admin.email, role: admin.role }, 'LOGIN', 'AdminUser', admin.id);
-  res.json({ id: admin.id, email: admin.email, name: admin.name, role: admin.role });
+  res.json({ id: admin.id, email: admin.email, name: admin.name, role: admin.role, csrfToken });
 }
 
 export async function logout(req: Request, res: Response) {
@@ -68,7 +68,8 @@ export async function me(req: Request, res: Response) {
   if (!admin || !admin.isActive) {
     throw new ApiError(401, 'Session invalide');
   }
-  res.json({ id: admin.id, email: admin.email, name: admin.name, role: admin.role });
+  const csrfToken = req.cookies?.[CSRF_COOKIE_NAME] as string | undefined;
+  res.json({ id: admin.id, email: admin.email, name: admin.name, role: admin.role, csrfToken });
 }
 
 export async function changePassword(req: Request, res: Response) {

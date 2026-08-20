@@ -75,6 +75,10 @@ export interface AdminUser {
   role: AdminRole;
 }
 
+export interface AuthResponse extends AdminUser {
+  csrfToken?: string;
+}
+
 export interface AdminAccount {
   id: string;
   email: string;
