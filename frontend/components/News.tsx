@@ -28,8 +28,8 @@ const NewsGallery: React.FC<{ images: string[]; alt: string }> = ({ images, alt 
   if (images.length === 0) return null;
 
   return (
-    <div className="relative h-56 overflow-hidden bg-gray-100 group/gallery">
-      <img src={images[index]} alt={alt} className="w-full h-full object-contain transition-opacity duration-500" />
+    <div className="relative group/gallery">
+      <img src={images[index]} alt={alt} className="block w-full h-auto" />
       {images.length > 1 && (
         <>
           <button
