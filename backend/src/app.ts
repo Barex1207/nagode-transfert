@@ -10,6 +10,7 @@ import adminUsersRoutes from './routes/admin-users.routes.js';
 import agenciesRoutes from './routes/agencies.routes.js';
 import auditLogRoutes from './routes/audit-log.routes.js';
 import authRoutes from './routes/auth.routes.js';
+import chatRoutes from './routes/chat.routes.js';
 import contactMessagesRoutes from './routes/contact-messages.routes.js';
 import destinationsRoutes from './routes/destinations.routes.js';
 import faqRoutes from './routes/faq.routes.js';
@@ -67,6 +68,7 @@ app.use('/api/audit-log', auditLogRoutes);
 app.use('/api/faq', faqRoutes);
 app.use('/api/testimonials', testimonialsRoutes);
 app.use('/api/team-members', teamMembersRoutes);
+app.use('/api/chat', chatRoutes);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

@@ -27,4 +27,8 @@ export const env = {
   get cloudinaryEnabled() {
     return Boolean(this.cloudinaryCloudName && this.cloudinaryApiKey && this.cloudinaryApiSecret);
   },
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY,
+  get chatEnabled() {
+    return Boolean(this.anthropicApiKey);
+  },
 };

@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import SupportModal from './components/SupportModal';
 import StickyMobileCTA from './components/StickyMobileCTA';
+import ChatWidget from './components/ChatWidget';
 import Home from './pages/Home';
 import { ServiceTab } from './types';
 
@@ -17,6 +18,7 @@ const Pricing = lazy(() => import('./components/Pricing'));
 const Schedules = lazy(() => import('./components/Schedules'));
 const Privacy = lazy(() => import('./pages/Privacy'));
 const Terms = lazy(() => import('./pages/Terms'));
+const ChatbotTerms = lazy(() => import('./pages/ChatbotTerms'));
 const ThankYou = lazy(() => import('./pages/ThankYou'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const Faq = lazy(() => import('./pages/Faq'));
@@ -53,6 +55,7 @@ const App: React.FC = () => {
             <Route path="/contact" element={<Contact />} />
             <Route path="/confidentialite" element={<Privacy />} />
             <Route path="/conditions" element={<Terms />} />
+            <Route path="/conditions-chatbot" element={<ChatbotTerms />} />
             <Route path="/merci" element={<ThankYou />} />
             <Route path="/faq" element={<Faq />} />
             <Route path="/avis" element={<Testimonials />} />
@@ -63,6 +66,7 @@ const App: React.FC = () => {
       <Footer onSupportClick={() => setIsSupportModalOpen(true)} />
       <SupportModal isOpen={isSupportModalOpen} onClose={() => setIsSupportModalOpen(false)} />
       <StickyMobileCTA />
+      <ChatWidget />
     </div>
   );
 };
