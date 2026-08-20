@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   LogOut,
   Mail,
+  Menu,
   MessageSquareHeart,
   Newspaper,
   Phone,
@@ -20,6 +21,7 @@ import {
   Tag,
   User,
   Users,
+  X,
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
@@ -91,6 +93,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate();
   const [badges, setBadges] = useState<Record<BadgeKey, number>>({ suggestions: 0, contact: 0, testimonials: 0 });
   const [profileOpen, setProfileOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -121,6 +124,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         key={to}
         to={to}
         end={end}
+        onClick={() => setMobileNavOpen(false)}
         className={({ isActive }) =>
           `flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
             isActive ? 'bg-brand-dark text-white' : 'text-gray-600 hover:bg-gray-100'
@@ -141,16 +145,33 @@ export function Layout({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex min-h-screen bg-brand-light">
-      <aside className="flex w-64 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
-        <div className="flex items-center gap-3 px-6 py-6">
-          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-100">
-            <img src={branding.logoUrl} alt={branding.siteName} className="h-full w-full object-contain p-0.5" />
+    <div className="flex min-h-screen bg-brand-light lg:overflow-hidden">
+      {mobileNavOpen && (
+        <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setMobileNavOpen(false)} />
+      )}
+
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-shrink-0 transform flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-out lg:static lg:z-auto lg:w-64 lg:translate-x-0 ${
+          mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+        }`}
+      >
+        <div className="flex items-center justify-between gap-3 px-6 py-6">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-100">
+              <img src={branding.logoUrl} alt={branding.siteName} className="h-full w-full object-contain p-0.5" />
+            </div>
+            <div>
+              <p className="text-lg font-black uppercase leading-tight tracking-tight text-brand-dark">Nagode</p>
+              <p className="text-xs font-medium text-gray-400">Espace Administrateur</p>
+            </div>
           </div>
-          <div>
-            <p className="text-lg font-black uppercase leading-tight tracking-tight text-brand-dark">Nagode</p>
-            <p className="text-xs font-medium text-gray-400">Espace Administrateur</p>
-          </div>
+          <button
+            onClick={() => setMobileNavOpen(false)}
+            aria-label="Fermer le menu"
+            className="rounded-lg p-1.5 text-gray-400 hover:bg-gray-100 lg:hidden"
+          >
+            <X size={20} />
+          </button>
         </div>
         <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-4">
           <div className="space-y-1">{renderLink(dashboardLink)}</div>
@@ -167,17 +188,25 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </nav>
       </aside>
 
-      <div className="flex flex-1 flex-col overflow-hidden">
-        <header className="flex items-center justify-end border-b border-gray-200 bg-white px-8 py-3">
-          <div className="relative">
+      <div className="flex min-w-0 flex-1 flex-col lg:overflow-hidden">
+        <header className="flex items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:px-8">
+          <button
+            onClick={() => setMobileNavOpen(true)}
+            aria-label="Ouvrir le menu"
+            className="rounded-lg p-2 text-gray-500 hover:bg-gray-100 lg:hidden"
+          >
+            <Menu size={22} />
+          </button>
+
+          <div className="relative ml-auto">
             <button
               onClick={() => setProfileOpen((o) => !o)}
-              className="flex items-center gap-3 rounded-lg px-2 py-1.5 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-gray-100 transition-colors sm:gap-3"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-brand-dark/10 text-brand-dark">
+              <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full bg-brand-dark/10 text-brand-dark">
                 <User size={18} />
               </div>
-              <div className="text-left">
+              <div className="hidden text-left sm:block">
                 <p className="text-sm font-bold text-gray-900 leading-none">{admin?.name}</p>
                 <p className="mt-0.5 text-xs text-gray-400 leading-none">
                   {admin?.role ? ROLE_LABEL[admin.role] ?? admin.role : ''}
@@ -206,7 +235,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );
