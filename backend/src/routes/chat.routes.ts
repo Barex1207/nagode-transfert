@@ -109,12 +109,18 @@ router.post(
     const { messages } = req.body as { messages: { role: 'user' | 'assistant'; content: string }[] };
     const system = await buildSystemPrompt();
 
-    const completion = await anthropic.messages.create({
-      model: MODEL,
-      max_tokens: 500,
-      system,
-      messages: messages.map((m) => ({ role: m.role, content: m.content })),
-    });
+    let completion;
+    try {
+      completion = await anthropic.messages.create({
+        model: MODEL,
+        max_tokens: 500,
+        system,
+        messages: messages.map((m) => ({ role: m.role, content: m.content })),
+      });
+    } catch (err) {
+      console.error('Anthropic API error:', err);
+      throw new ApiError(503, "L'assistant est momentanément indisponible. Réessayez dans un instant.");
+    }
 
     const reply = completion.content.find((block) => block.type === 'text')?.text ?? '';
     res.json({ reply });
