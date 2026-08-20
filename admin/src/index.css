@@ -18,6 +18,19 @@ body {
   to { opacity: 1; transform: translateY(0); }
 }
 
+/* Opacity-only on purpose: a lingering `transform` (even translateY(0) via
+   animation-fill-mode) makes this element a new containing block for any
+   `position: fixed` descendant — which broke every modal's centering when
+   this wrapped page content that could contain one. */
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.35s ease-out both;
+}
+
 @keyframes shake {
   10%, 90% { transform: translateX(-1px); }
   20%, 80% { transform: translateX(2px); }

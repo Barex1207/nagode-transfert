@@ -165,9 +165,6 @@ export default function News() {
             <Field label="Titre">
               <Input required value={form.title} onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))} />
             </Field>
-            <Field label="Résumé (aperçu court)">
-              <Input value={form.excerpt} onChange={(e) => setForm((f) => ({ ...f, excerpt: e.target.value }))} />
-            </Field>
             <Field label="Contenu">
               <Textarea
                 required

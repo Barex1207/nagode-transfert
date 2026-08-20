@@ -13,7 +13,7 @@ interface ConfirmDialogProps {
 export function ConfirmDialog({ title, message, onConfirm, onCancel, loading }: ConfirmDialogProps) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm animate-fade-in-up"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-ink/40 p-4 backdrop-blur-sm animate-fade-in"
       style={{ animationDuration: '0.15s' }}
       onClick={onCancel}
     >
