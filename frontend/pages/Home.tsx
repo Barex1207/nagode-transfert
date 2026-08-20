@@ -8,6 +8,7 @@ import BusRental from '../components/BusRental';
 import Services from '../components/Services';
 import Destinations from '../components/Destinations';
 import Team from '../components/Team';
+import FaqPreview from '../components/FaqPreview';
 import MobileApp from '../components/MobileApp';
 import { ServiceTab } from '../types';
 import { useDocumentHead } from '../lib/useDocumentHead';
@@ -53,6 +54,7 @@ const Home: React.FC<HomeProps> = ({ activeBookingTab, onTabChange }) => {
       <Services />
       <Destinations />
       <Team />
+      <FaqPreview />
 
       <div className="pb-24 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

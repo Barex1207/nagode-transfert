@@ -1,8 +1,10 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { MapPin } from 'lucide-react';
 import BookingForm from './BookingForm';
 import { ServiceTab } from '../types';
 import { useSettings } from '../context/SettingsContext';
+import { api } from '../lib/api';
 
 interface HeroProps {
   activeBookingTab: ServiceTab;
@@ -11,6 +13,18 @@ interface HeroProps {
 
 const Hero: React.FC<HeroProps> = ({ activeBookingTab, onTabChange }) => {
   const settings = useSettings();
+  const [agencyCount, setAgencyCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (settings.heroUsersLabel) return; // admin set a custom stat, no need to fetch
+    api
+      .get<unknown[]>('/agencies')
+      .then((data) => setAgencyCount(data.length))
+      .catch(() => setAgencyCount(null));
+  }, [settings.heroUsersLabel]);
+
+  const statValue = settings.heroUsersLabel || (agencyCount ? `+${agencyCount}` : null);
+  const statLabel = settings.heroUsersLabel ? 'Utilisateurs satisfaits' : 'Agences en Afrique de l’Ouest';
 
   return (
     <div className="relative min-h-screen flex items-center overflow-hidden pt-16">
@@ -37,19 +51,27 @@ const Hero: React.FC<HeroProps> = ({ activeBookingTab, onTabChange }) => {
             <p className="text-xl text-white/80 font-medium max-w-lg leading-relaxed">
               Réservez votre trajet, suivez vos colis, ou effectuez des transferts d'argent facilement avec <span className="font-bold text-white">NAGODE TRANSFERT</span>.
             </p>
-            <div className="flex gap-4">
-               <div className="flex -space-x-3">
-                 {[1,2,3,4].map(i => (
-                   <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center overflow-hidden shadow-lg">
-                     <img src={`https://i.pravatar.cc/100?img=${i+10}`} alt="User" />
-                   </div>
-                 ))}
-               </div>
-               <div className="text-sm flex flex-col justify-center">
-                  <div className="font-bold text-lg">{settings.heroUsersLabel}</div>
-                  <div className="text-white/60 text-xs uppercase tracking-wider font-bold">Utilisateurs satisfaits</div>
-               </div>
-            </div>
+            {statValue && (
+              <div className="flex gap-4">
+                {settings.heroUsersLabel ? (
+                  <div className="flex -space-x-3">
+                    {[1, 2, 3, 4].map((i) => (
+                      <div key={i} className="w-10 h-10 rounded-full border-2 border-white bg-gray-300 flex items-center justify-center overflow-hidden shadow-lg">
+                        <img src={`https://i.pravatar.cc/100?img=${i + 10}`} alt="" />
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="w-10 h-10 rounded-full border-2 border-white bg-[var(--brand-accent)]/20 flex items-center justify-center shadow-lg text-[var(--brand-accent)]">
+                    <MapPin size={18} />
+                  </div>
+                )}
+                <div className="text-sm flex flex-col justify-center">
+                  <div className="font-bold text-lg">{statValue}</div>
+                  <div className="text-white/60 text-xs uppercase tracking-wider font-bold">{statLabel}</div>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center lg:justify-end animate-in slide-in-from-right-8 duration-700">

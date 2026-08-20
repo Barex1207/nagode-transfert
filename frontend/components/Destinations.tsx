@@ -8,6 +8,7 @@ interface Destination {
   siteLabel: string;
   countryCode: string;
   imageUrl: string | null;
+  status: 'ACTIVE' | 'COMING_SOON';
 }
 
 const Destinations: React.FC = () => {
@@ -44,12 +45,22 @@ const Destinations: React.FC = () => {
                 <img
                   src={country.imageUrl}
                   alt={`${country.name} - ${country.siteLabel}`}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  className={`absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${
+                    country.status === 'COMING_SOON' ? 'grayscale-[60%]' : ''
+                  }`}
                 />
               )}
 
               {/* Overlay dégradé */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/30 to-transparent"></div>
+
+              {country.status === 'COMING_SOON' && (
+                <div className="absolute top-6 left-6">
+                  <span className="bg-black/70 backdrop-blur-md text-white text-[10px] font-black py-2 px-4 rounded-full border border-white/20 uppercase tracking-widest">
+                    Bientôt disponible
+                  </span>
+                </div>
+              )}
 
               {/* Infos Pays */}
               <div className="absolute bottom-8 left-6 right-6 flex flex-col gap-2">
@@ -71,12 +82,14 @@ const Destinations: React.FC = () => {
                  </div>
               </div>
 
-              {/* Tag "Nagode" discret au survol */}
-              <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-black py-2 px-4 rounded-full border border-white/20 uppercase tracking-widest">
-                  Nagode Line
-                </span>
-              </div>
+              {/* Tag "Nagode" discret au survol, seulement pour les lignes actives */}
+              {country.status === 'ACTIVE' && (
+                <div className="absolute top-6 right-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <span className="bg-white/10 backdrop-blur-md text-white text-[10px] font-black py-2 px-4 rounded-full border border-white/20 uppercase tracking-widest">
+                    Nagode Line
+                  </span>
+                </div>
+              )}
             </div>
           ))}
         </div>

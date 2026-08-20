@@ -95,6 +95,7 @@ export const destinationSchema = z.object({
     .max(2)
     .regex(/^[a-z]{2}$/, 'Code pays ISO à deux lettres minuscules (ex: tg)'),
   imageUrl: z.string().url().nullable().optional(),
+  status: z.enum(['ACTIVE', 'COMING_SOON']).optional().default('ACTIVE'),
   order: z.coerce.number().int().optional().default(0),
 });
 

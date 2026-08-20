@@ -113,12 +113,15 @@ export interface AuditLogEntry {
   createdAt: string;
 }
 
+export type DestinationStatus = 'ACTIVE' | 'COMING_SOON';
+
 export interface Destination {
   id: string;
   name: string;
   siteLabel: string;
   countryCode: string;
   imageUrl: string | null;
+  status: DestinationStatus;
   order: number;
   createdAt: string;
   updatedAt: string;

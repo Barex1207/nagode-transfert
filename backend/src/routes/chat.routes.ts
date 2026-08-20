@@ -24,13 +24,14 @@ const ASSISTANT_NAME = 'Nagode';
 const MODEL = 'claude-haiku-4-5-20251001';
 
 async function buildSystemPrompt(): Promise<string> {
-  const [settings, faq, agencies, fares, supportNumbers, schedules] = await Promise.all([
+  const [settings, faq, agencies, fares, supportNumbers, schedules, destinations] = await Promise.all([
     prisma.siteSettings.findUnique({ where: { id: 'main' } }),
     prisma.faqItem.findMany({ orderBy: { order: 'asc' } }),
     prisma.agency.findMany({ orderBy: { order: 'asc' } }),
     prisma.fare.findMany({ orderBy: { order: 'asc' } }),
     prisma.supportNumber.findMany({ orderBy: { order: 'asc' } }),
     prisma.schedule.findMany({ orderBy: { order: 'asc' }, include: { agency: true } }),
+    prisma.destination.findMany({ orderBy: { order: 'asc' } }),
   ]);
 
   const siteName = settings?.siteName ?? 'Nagode Transfert';
@@ -70,11 +71,25 @@ async function buildSystemPrompt(): Promise<string> {
   const supportBlock =
     supportNumbers.map((s) => `- ${s.category}: ${s.phone}`).join('\n') || 'Aucune donnée.';
 
+  const activeDestinations = destinations.filter((d) => d.status === 'ACTIVE');
+  const comingSoonDestinations = destinations.filter((d) => d.status === 'COMING_SOON');
+  const destinationsBlock = [
+    activeDestinations.length ? `En service : ${activeDestinations.map((d) => d.name).join(', ')}` : '',
+    comingSoonDestinations.length
+      ? `Bientôt disponible, PAS ENCORE desservi : ${comingSoonDestinations.map((d) => d.name).join(', ')}`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('\n') || 'Aucune donnée.';
+
   return `Tu es ${ASSISTANT_NAME}, l'assistant virtuel officiel du site de ${siteName}, une société de transport, colis et transfert d'argent en Afrique de l'Ouest.
 
 RÈGLES STRICTES :
 - Réponds toujours en français, de façon brève, chaleureuse et professionnelle (2-4 phrases maximum sauf si on te demande une liste).
-- Utilise UNIQUEMENT les informations fournies ci-dessous (tarifs, horaires, agences, FAQ, numéros). N'invente JAMAIS un prix, un horaire ou une donnée qui n'est pas dans ce contexte.
+- Utilise UNIQUEMENT les informations fournies ci-dessous (tarifs, horaires, agences, FAQ, numéros, destinations). N'invente JAMAIS un prix, un horaire ou une donnée qui n'est pas dans ce contexte.
+- Si la ligne/route exacte demandée (origine + destination précises) n'apparaît PAS dans la liste des tarifs ou horaires ci-dessous, dis clairement que tu n'as pas cette information ou que cette ligne n'est pas desservie — NE DONNE JAMAIS le tarif ou l'horaire d'une autre ligne à la place, même si elle partage une ville avec la question posée.
+- Une destination listée comme "Bientôt disponible, PAS ENCORE desservi" ne doit JAMAIS être présentée comme une ligne active : dis explicitement qu'elle n'est pas encore en service.
+- Si une ville a plusieurs agences dans la liste ci-dessous, ne choisis pas arbitrairement laquelle : liste-les toutes (avec leur numéro) et demande au client de préciser celle qui lui convient.
 - Si tu ne trouves pas l'information demandée, dis-le clairement et oriente vers le numéro d'assistance approprié ci-dessous, ou vers le formulaire de contact du site.
 - Pour toute réservation, paiement, réclamation ou question sensible (numéro de billet, litige, remboursement), ne traite jamais la demande toi-même : oriente vers un numéro d'assistance ou le formulaire de contact.
 - Ne demande et ne répète jamais de données bancaires ou de mot de passe.
@@ -95,7 +110,10 @@ ${faresBlock}
 ${schedulesBlock}
 
 ## Numéros d'assistance
-${supportBlock}`;
+${supportBlock}
+
+## Destinations
+${destinationsBlock}`;
 }
 
 router.post(

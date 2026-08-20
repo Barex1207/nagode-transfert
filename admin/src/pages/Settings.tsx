@@ -138,8 +138,12 @@ export default function Settings() {
             onChange={(url) => setForm((f) => f && { ...f, heroImageUrl: url })}
           />
         </Field>
-        <Field label="Texte statistique (ex: +50,000)">
+        <Field
+          label="Texte statistique du hero (optionnel)"
+          hint="Laissez vide pour afficher automatiquement un chiffre réel (nombre d'agences). Ne mettez que des chiffres que vous pouvez justifier — pas de valeur inventée."
+        >
           <Input
+            placeholder="ex : +12 000 colis livrés"
             value={form.heroUsersLabel}
             onChange={(e) => setForm((f) => f && { ...f, heroUsersLabel: e.target.value })}
           />

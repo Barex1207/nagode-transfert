@@ -74,7 +74,7 @@ model SiteSettings {
   instagramUrl       String?
   twitterUrl         String?
   heroImageUrl       String?
-  heroUsersLabel      String   @default("+50,000")
+  heroUsersLabel      String   @default("")
   appStoreUrl        String?
   playStoreUrl       String?
   appPreviewImageUrl String?
@@ -142,15 +142,21 @@ model Fare {
   updatedAt   DateTime @updatedAt
 }
 
+enum DestinationStatus {
+  ACTIVE
+  COMING_SOON
+}
+
 model Destination {
-  id          String   @id @default(uuid())
+  id          String            @id @default(uuid())
   name        String
-  siteLabel   String   @default("")
+  siteLabel   String            @default("")
   countryCode String
   imageUrl    String?
-  order       Int      @default(0)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  status      DestinationStatus @default(ACTIVE)
+  order       Int               @default(0)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
 }
 
 model Service {

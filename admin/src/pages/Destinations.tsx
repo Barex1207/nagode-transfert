@@ -1,18 +1,28 @@
 import React, { useState } from 'react';
 import { Loader2, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useResource } from '../lib/useResource';
-import type { Destination } from '../types';
+import type { Destination, DestinationStatus } from '../types';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { DraggableList } from '../components/ui/DraggableList';
-import { Field, Input } from '../components/ui/Field';
+import { Field, Input, Select } from '../components/ui/Field';
 import { ImageUpload } from '../components/ui/ImageUpload';
 import { ApiError } from '../lib/api';
 
+const STATUS_LABEL: Record<DestinationStatus, string> = {
+  ACTIVE: 'En service',
+  COMING_SOON: 'Bientôt disponible',
+};
+
+const STATUS_BADGE: Record<DestinationStatus, string> = {
+  ACTIVE: 'bg-green-50 text-green-700',
+  COMING_SOON: 'bg-amber-50 text-amber-700',
+};
+
 type FormState = Omit<Destination, 'id' | 'createdAt' | 'updatedAt'>;
 
-const emptyForm: FormState = { name: '', siteLabel: '', countryCode: '', imageUrl: null, order: 0 };
+const emptyForm: FormState = { name: '', siteLabel: '', countryCode: '', imageUrl: null, status: 'ACTIVE', order: 0 };
 
 export default function Destinations() {
   const { items, loading, error, create, update, remove, reorder } = useResource<Destination>('/destinations');
@@ -92,15 +102,20 @@ export default function Destinations() {
               {item.imageUrl && <img src={item.imageUrl} alt={item.name} className="h-full w-full object-cover" />}
             </div>
             <div className="p-4">
-              <div className="flex items-center gap-2">
-                <img
-                  src={`https://flagcdn.com/w40/${item.countryCode}.png`}
-                  alt={item.countryCode}
-                  className="h-4 w-6 rounded object-cover"
-                />
-                <h3 className="font-bold text-gray-900">{item.name}</h3>
+              <div className="mb-1 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <img
+                    src={`https://flagcdn.com/w40/${item.countryCode}.png`}
+                    alt={item.countryCode}
+                    className="h-4 w-6 rounded object-cover"
+                  />
+                  <h3 className="font-bold text-gray-900">{item.name}</h3>
+                </div>
+                <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[item.status]}`}>
+                  {STATUS_LABEL[item.status]}
+                </span>
               </div>
-              <p className="mt-1 text-sm text-gray-400">{item.siteLabel}</p>
+              <p className="text-sm text-gray-400">{item.siteLabel}</p>
               <div className="mt-4 flex gap-2">
                 <Button variant="secondary" className="flex-1" onClick={() => openEdit(item)}>
                   <Pencil size={14} /> Modifier
@@ -141,6 +156,18 @@ export default function Destinations() {
                 value={form.countryCode}
                 onChange={(e) => setForm((f) => ({ ...f, countryCode: e.target.value }))}
               />
+            </Field>
+            <Field label="Statut" hint="« Bientôt disponible » s'affiche distinctement sur le site et empêche le chatbot de la présenter comme une ligne active.">
+              <Select
+                value={form.status}
+                onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as DestinationStatus }))}
+              >
+                {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
             </Field>
             <Field label="Ordre d'affichage">
               <Input
