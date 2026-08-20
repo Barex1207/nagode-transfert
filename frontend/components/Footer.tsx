@@ -14,7 +14,7 @@ const Footer: React.FC<FooterProps> = ({ onSupportClick }) => {
   const customLogo = settings.logoUrl ?? "https://nagodetransfert.com/wp-content/uploads/2023/03/FB_IMG_1679044436873-72x72.jpg";
 
   return (
-    <footer className="bg-brand-light border-t border-gray-200">
+    <footer id="site-footer" className="bg-brand-light border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Trust Bar */}
         <div className="py-12 border-b border-gray-200 grid grid-cols-1 md:grid-cols-3 gap-8">

@@ -23,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import { useBranding } from '../lib/useBranding';
 import type { ContactMessage, Suggestion, Testimonial } from '../types';
 
 type BadgeKey = 'suggestions' | 'contact' | 'testimonials';
@@ -86,6 +87,7 @@ const ROLE_LABEL: Record<string, string> = {
 
 export function Layout({ children }: { children: React.ReactNode }) {
   const { admin, logout } = useAuth();
+  const branding = useBranding();
   const navigate = useNavigate();
   const [badges, setBadges] = useState<Record<BadgeKey, number>>({ suggestions: 0, contact: 0, testimonials: 0 });
   const [profileOpen, setProfileOpen] = useState(false);
@@ -141,9 +143,14 @@ export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen bg-brand-light">
       <aside className="flex w-64 flex-shrink-0 flex-col border-r border-gray-200 bg-white">
-        <div className="px-6 py-6">
-          <p className="text-lg font-black uppercase tracking-tight text-brand-dark">Nagode</p>
-          <p className="text-xs font-medium text-gray-400">Espace Administrateur</p>
+        <div className="flex items-center gap-3 px-6 py-6">
+          <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-100">
+            <img src={branding.logoUrl} alt={branding.siteName} className="h-full w-full object-contain p-0.5" />
+          </div>
+          <div>
+            <p className="text-lg font-black uppercase leading-tight tracking-tight text-brand-dark">Nagode</p>
+            <p className="text-xs font-medium text-gray-400">Espace Administrateur</p>
+          </div>
         </div>
         <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-4">
           <div className="space-y-1">{renderLink(dashboardLink)}</div>
