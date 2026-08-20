@@ -19,7 +19,7 @@ const chatLimiter = rateLimit({
 
 const anthropic = env.anthropicApiKey ? new Anthropic({ apiKey: env.anthropicApiKey }) : null;
 
-const ASSISTANT_NAME = 'Nago';
+const ASSISTANT_NAME = 'Nagode';
 const MODEL = 'claude-haiku-4-5-20251001';
 
 async function buildSystemPrompt(): Promise<string> {

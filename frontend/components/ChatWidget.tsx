@@ -4,7 +4,7 @@ import { MessageCircle, Send, Sparkles, X } from 'lucide-react';
 import { api, ApiError } from '../lib/api';
 import { useSettings } from '../context/SettingsContext';
 
-const ASSISTANT_NAME = 'Nago';
+const ASSISTANT_NAME = 'Nagode';
 
 interface ChatMessage {
   role: 'user' | 'assistant';

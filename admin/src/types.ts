@@ -1,4 +1,14 @@
 export type VehicleStatus = 'ACTIF' | 'MAINTENANCE' | 'HORS_SERVICE';
+export type VehicleCategory = 'STANDARD' | 'VIP' | 'PRESTIGE';
+export type VehicleAmenity =
+  | 'CLIMATISATION'
+  | 'WIFI'
+  | 'USB'
+  | 'SIEGES_INCLINABLES'
+  | 'TOILETTES'
+  | 'ECRAN'
+  | 'BAGAGES'
+  | 'COLLATION';
 
 export interface Vehicle {
   id: string;
@@ -8,6 +18,9 @@ export interface Vehicle {
   description: string;
   capacity: number;
   status: VehicleStatus;
+  category: VehicleCategory;
+  amenities: VehicleAmenity[];
+  routes: string[];
   order: number;
   createdAt: string;
   updatedAt: string;

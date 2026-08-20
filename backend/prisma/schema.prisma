@@ -13,6 +13,12 @@ enum VehicleStatus {
   HORS_SERVICE
 }
 
+enum VehicleCategory {
+  STANDARD
+  VIP
+  PRESTIGE
+}
+
 enum FareType {
   BUS
   COLIS
@@ -76,16 +82,19 @@ model SiteSettings {
 }
 
 model Vehicle {
-  id          String        @id @default(uuid())
+  id          String          @id @default(uuid())
   name        String
   model       String
   imageUrl    String?
-  description String        @default("")
-  capacity    Int           @default(0)
-  status      VehicleStatus @default(ACTIF)
-  order       Int           @default(0)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  description String          @default("")
+  capacity    Int             @default(0)
+  status      VehicleStatus   @default(ACTIF)
+  category    VehicleCategory @default(STANDARD)
+  amenities   String[]        @default([])
+  routes      String[]        @default([])
+  order       Int             @default(0)
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
 }
 
 model Agency {

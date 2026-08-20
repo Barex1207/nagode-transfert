@@ -1,13 +1,28 @@
 import React, { useMemo, useState } from 'react';
-import { Bus, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import {
+  Armchair,
+  Bus,
+  Coffee,
+  Luggage,
+  Pencil,
+  Plus,
+  Search,
+  Snowflake,
+  Toilet,
+  Trash2,
+  Tv,
+  Usb,
+  Wifi,
+} from 'lucide-react';
 import { useResource } from '../lib/useResource';
-import type { Vehicle, VehicleStatus } from '../types';
+import type { Vehicle, VehicleAmenity, VehicleCategory, VehicleStatus } from '../types';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { DraggableList } from '../components/ui/DraggableList';
 import { Field, Input, Select, Textarea } from '../components/ui/Field';
 import { ImageUpload } from '../components/ui/ImageUpload';
+import { TagListInput } from '../components/ui/TagListInput';
 import { PageHeader } from '../components/ui/PageHeader';
 import { EmptyState } from '../components/ui/EmptyState';
 import { Skeleton } from '../components/ui/Skeleton';
@@ -25,6 +40,36 @@ const STATUS_BADGE: Record<VehicleStatus, string> = {
   HORS_SERVICE: 'bg-red-50 text-red-700',
 };
 
+const CATEGORY_LABEL: Record<VehicleCategory, string> = {
+  STANDARD: 'Standard',
+  VIP: 'VIP',
+  PRESTIGE: 'Prestige',
+};
+
+export const AMENITY_LABEL: Record<VehicleAmenity, string> = {
+  CLIMATISATION: 'Climatisation',
+  WIFI: 'Wifi à bord',
+  USB: 'Prises USB',
+  SIEGES_INCLINABLES: 'Sièges inclinables',
+  TOILETTES: 'Toilettes à bord',
+  ECRAN: 'Écran de divertissement',
+  BAGAGES: 'Grand espace bagages',
+  COLLATION: 'Collation offerte',
+};
+
+export const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: number }>> = {
+  CLIMATISATION: Snowflake,
+  WIFI: Wifi,
+  USB: Usb,
+  SIEGES_INCLINABLES: Armchair,
+  TOILETTES: Toilet,
+  ECRAN: Tv,
+  BAGAGES: Luggage,
+  COLLATION: Coffee,
+};
+
+const AMENITY_KEYS = Object.keys(AMENITY_LABEL) as VehicleAmenity[];
+
 type FormState = Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>;
 
 const emptyForm: FormState = {
@@ -34,6 +79,9 @@ const emptyForm: FormState = {
   description: '',
   capacity: 0,
   status: 'ACTIF',
+  category: 'STANDARD',
+  amenities: [],
+  routes: [],
   order: 0,
 };
 
@@ -61,6 +109,13 @@ export default function Vehicles() {
     setForm(rest);
     setFormError(null);
     setFormOpen(true);
+  }
+
+  function toggleAmenity(key: VehicleAmenity) {
+    setForm((f) => ({
+      ...f,
+      amenities: f.amenities.includes(key) ? f.amenities.filter((a) => a !== key) : [...f.amenities, key],
+    }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -103,7 +158,7 @@ export default function Vehicles() {
   function renderCard(vehicle: Vehicle) {
     return (
       <div className="group overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-        <div className="h-36 overflow-hidden bg-surface">
+        <div className="relative h-36 overflow-hidden bg-surface">
           {vehicle.imageUrl ? (
             <img
               src={vehicle.imageUrl}
@@ -115,6 +170,9 @@ export default function Vehicles() {
               <Bus size={28} />
             </div>
           )}
+          <span className="absolute left-2 top-2 rounded-full bg-brand-dark px-2 py-0.5 text-[10px] font-black uppercase tracking-wide text-white shadow-sm">
+            {CATEGORY_LABEL[vehicle.category]}
+          </span>
         </div>
         <div className="p-4">
           <div className="mb-1 flex items-start justify-between gap-2">
@@ -126,6 +184,18 @@ export default function Vehicles() {
           <p className="text-sm text-gray-500">
             {vehicle.model} · {vehicle.capacity} places
           </p>
+          {vehicle.amenities.length > 0 && (
+            <div className="mt-2 flex flex-wrap gap-1.5 text-gray-400">
+              {vehicle.amenities.map((a) => {
+                const Icon = AMENITY_ICON[a];
+                return (
+                  <span key={a} title={AMENITY_LABEL[a]} className="flex h-6 w-6 items-center justify-center rounded-full bg-surface">
+                    <Icon size={12} />
+                  </span>
+                );
+              })}
+            </div>
+          )}
           {vehicle.description && <p className="mt-2 text-sm text-gray-400 line-clamp-2">{vehicle.description}</p>}
           <div className="mt-4 flex gap-2">
             <Button variant="secondary" className="flex-1" onClick={() => openEdit(vehicle)}>
@@ -221,12 +291,12 @@ export default function Vehicles() {
                   onChange={(e) => setForm((f) => ({ ...f, capacity: Number(e.target.value) }))}
                 />
               </Field>
-              <Field label="Statut">
+              <Field label="Catégorie">
                 <Select
-                  value={form.status}
-                  onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as VehicleStatus }))}
+                  value={form.category}
+                  onChange={(e) => setForm((f) => ({ ...f, category: e.target.value as VehicleCategory }))}
                 >
-                  {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                  {Object.entries(CATEGORY_LABEL).map(([value, label]) => (
                     <option key={value} value={value}>
                       {label}
                     </option>
@@ -234,6 +304,48 @@ export default function Vehicles() {
                 </Select>
               </Field>
             </div>
+            <Field label="Statut">
+              <Select value={form.status} onChange={(e) => setForm((f) => ({ ...f, status: e.target.value as VehicleStatus }))}>
+                {Object.entries(STATUS_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+
+            <Field label="Équipements à bord">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                {AMENITY_KEYS.map((key) => {
+                  const Icon = AMENITY_ICON[key];
+                  const checked = form.amenities.includes(key);
+                  return (
+                    <button
+                      type="button"
+                      key={key}
+                      onClick={() => toggleAmenity(key)}
+                      className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-left text-xs font-semibold transition-colors ${
+                        checked
+                          ? 'border-brand-primary bg-brand-primary/10 text-brand-dark'
+                          : 'border-line text-gray-500 hover:border-brand-primary/40'
+                      }`}
+                    >
+                      <Icon size={15} />
+                      {AMENITY_LABEL[key]}
+                    </button>
+                  );
+                })}
+              </div>
+            </Field>
+
+            <Field label="Trajets / lignes desservis" hint="Ajoutez un trajet puis appuyez sur Entrée">
+              <TagListInput
+                value={form.routes}
+                onChange={(routes) => setForm((f) => ({ ...f, routes }))}
+                placeholder="ex : Lomé → Kara"
+              />
+            </Field>
+
             <Field label="Description">
               <Textarea
                 rows={3}
@@ -255,7 +367,7 @@ export default function Vehicles() {
               <Button type="button" variant="secondary" onClick={() => setFormOpen(false)}>
                 Annuler
               </Button>
-              <Button type="submit" disabled={saving}>
+              <Button type="submit" loading={saving}>
                 {saving ? 'Enregistrement…' : 'Enregistrer'}
               </Button>
             </div>

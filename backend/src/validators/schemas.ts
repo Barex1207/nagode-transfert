@@ -17,6 +17,17 @@ export const loginSchema = z.object({
   password: z.string().min(8),
 });
 
+export const VEHICLE_AMENITY_KEYS = [
+  'CLIMATISATION',
+  'WIFI',
+  'USB',
+  'SIEGES_INCLINABLES',
+  'TOILETTES',
+  'ECRAN',
+  'BAGAGES',
+  'COLLATION',
+] as const;
+
 export const vehicleSchema = z.object({
   name: z.string().min(1).max(120),
   model: z.string().min(1).max(120),
@@ -24,6 +35,9 @@ export const vehicleSchema = z.object({
   description: z.string().max(2000).optional().default(''),
   capacity: z.coerce.number().int().min(0).max(200).optional().default(0),
   status: z.enum(['ACTIF', 'MAINTENANCE', 'HORS_SERVICE']).optional().default('ACTIF'),
+  category: z.enum(['STANDARD', 'VIP', 'PRESTIGE']).optional().default('STANDARD'),
+  amenities: z.array(z.enum(VEHICLE_AMENITY_KEYS)).optional().default([]),
+  routes: z.array(z.string().min(1).max(120)).max(20).optional().default([]),
   order: z.coerce.number().int().optional().default(0),
 });
 

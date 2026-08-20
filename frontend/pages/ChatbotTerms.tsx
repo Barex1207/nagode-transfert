@@ -15,21 +15,21 @@ const ChatbotTerms: React.FC = () => {
 
   useDocumentHead({
     title: "Conditions d'utilisation du chatbot",
-    description: `Ce que vous devez savoir avant d'utiliser l'assistant virtuel Nago sur le site de ${settings.siteName}.`,
+    description: `Ce que vous devez savoir avant d'utiliser l'assistant virtuel Nagode sur le site de ${settings.siteName}.`,
   });
 
   return (
     <LegalLayout title="Conditions d'utilisation du chatbot" updatedAt="Août 2026">
       <Section title="1. Nature du service">
         <p>
-          « Nago » est un assistant virtuel basé sur l'intelligence artificielle, mis à disposition sur le site de{' '}
+          « Nagode » est un assistant virtuel basé sur l'intelligence artificielle, mis à disposition sur le site de{' '}
           {settings.siteName} pour répondre à vos questions sur nos trajets, tarifs, horaires, agences et services.
           Il ne remplace pas un conseiller humain et n'a pas accès à vos réservations personnelles.
         </p>
       </Section>
       <Section title="2. Fiabilité des réponses">
         <p>
-          Nago s'appuie sur les informations publiées par {settings.siteName}, mais reste une IA en apprentissage :
+          Nagode s'appuie sur les informations publiées par {settings.siteName}, mais reste une IA en apprentissage :
           ses réponses peuvent être incomplètes ou inexactes. Pour toute décision importante — réservation, paiement,
           réclamation, litige — vérifiez systématiquement l'information auprès de l'une de nos agences ou de nos
           numéros d'assistance officiels.
@@ -38,12 +38,12 @@ const ChatbotTerms: React.FC = () => {
       <Section title="3. Ce que vous ne devez pas partager">
         <p>
           Ne communiquez jamais vos mots de passe, coordonnées bancaires complètes ou codes de sécurité dans la
-          conversation. Nago ne vous les demandera jamais.
+          conversation. Nagode ne vous les demandera jamais.
         </p>
       </Section>
       <Section title="4. Données de conversation">
         <p>
-          Les messages échangés avec Nago sont traités pour générer une réponse et peuvent être conservés
+          Les messages échangés avec Nagode sont traités pour générer une réponse et peuvent être conservés
           temporairement à des fins d'amélioration du service. Ils sont soumis à notre{' '}
           <a href="/confidentialite" className="text-[var(--brand-dark)] font-bold">
             politique de confidentialité
