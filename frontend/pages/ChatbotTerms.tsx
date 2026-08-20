@@ -22,17 +22,17 @@ const ChatbotTerms: React.FC = () => {
     <LegalLayout title="Conditions d'utilisation du chatbot" updatedAt="Août 2026">
       <Section title="1. Nature du service">
         <p>
-          « Nagode » est un assistant virtuel basé sur l'intelligence artificielle, mis à disposition sur le site de{' '}
-          {settings.siteName} pour répondre à vos questions sur nos trajets, tarifs, horaires, agences et services.
-          Il ne remplace pas un conseiller humain et n'a pas accès à vos réservations personnelles.
+          « Nagode » est un assistant virtuel automatisé, mis à disposition sur le site de {settings.siteName} pour
+          répondre à vos questions sur nos trajets, tarifs, horaires, agences et services. Il ne remplace pas un
+          conseiller humain et n'a pas accès à vos réservations personnelles.
         </p>
       </Section>
       <Section title="2. Fiabilité des réponses">
         <p>
-          Nagode s'appuie sur les informations publiées par {settings.siteName}, mais reste une IA en apprentissage :
-          ses réponses peuvent être incomplètes ou inexactes. Pour toute décision importante — réservation, paiement,
-          réclamation, litige — vérifiez systématiquement l'information auprès de l'une de nos agences ou de nos
-          numéros d'assistance officiels.
+          Nagode s'appuie sur les informations publiées par {settings.siteName}, mais ses réponses peuvent être
+          incomplètes ou inexactes. Pour toute décision importante — réservation, paiement, réclamation, litige —
+          vérifiez systématiquement l'information auprès de l'une de nos agences ou de nos numéros d'assistance
+          officiels.
         </p>
       </Section>
       <Section title="3. Ce que vous ne devez pas partager">

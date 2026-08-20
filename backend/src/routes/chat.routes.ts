@@ -3,7 +3,8 @@ import { Router } from 'express';
 import rateLimit from 'express-rate-limit';
 import { env } from '../lib/env.js';
 import { prisma } from '../lib/prisma.js';
-import { ApiError, asyncHandler } from '../middleware/errorHandler.js';
+import { answerLocally } from '../lib/localAssistant.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
 import { validateBody } from '../middleware/validate.js';
 import { chatSchema } from '../validators/schemas.js';
 
@@ -102,28 +103,30 @@ router.post(
   chatLimiter,
   validateBody(chatSchema),
   asyncHandler(async (req, res) => {
+    const { messages } = req.body as { messages: { role: 'user' | 'assistant'; content: string }[] };
+    const lastUserMessage = [...messages].reverse().find((m) => m.role === 'user')?.content ?? '';
+
     if (!anthropic) {
-      throw new ApiError(503, "L'assistant n'est pas encore configuré. Merci de contacter le support.");
+      res.json({ reply: await answerLocally(lastUserMessage) });
+      return;
     }
 
-    const { messages } = req.body as { messages: { role: 'user' | 'assistant'; content: string }[] };
-    const system = await buildSystemPrompt();
-
-    let completion;
     try {
-      completion = await anthropic.messages.create({
+      const system = await buildSystemPrompt();
+      const completion = await anthropic.messages.create({
         model: MODEL,
         max_tokens: 500,
         system,
         messages: messages.map((m) => ({ role: m.role, content: m.content })),
       });
+      const reply = completion.content.find((block) => block.type === 'text')?.text ?? '';
+      res.json({ reply });
     } catch (err) {
-      console.error('Anthropic API error:', err);
-      throw new ApiError(503, "L'assistant est momentanément indisponible. Réessayez dans un instant.");
+      // Claude API unavailable (billing, rate limit, network...) — degrade to
+      // the free local matcher instead of failing the request outright.
+      console.error('Anthropic API error, falling back to local assistant:', err);
+      res.json({ reply: await answerLocally(lastUserMessage) });
     }
-
-    const reply = completion.content.find((block) => block.type === 'text')?.text ?? '';
-    res.json({ reply });
   }),
 );
 

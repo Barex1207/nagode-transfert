@@ -126,9 +126,9 @@ const ChatWidget: React.FC = () => {
                   nos agences ou l'envoi de colis — je réponds 24h/24.
                 </p>
                 <div className="rounded-2xl bg-amber-50 border border-amber-100 p-3.5 text-xs leading-relaxed text-amber-800">
-                  {ASSISTANT_NAME} est une intelligence artificielle en apprentissage : ses réponses peuvent
-                  contenir des erreurs. Pour toute information sensible (paiement, réservation, réclamation),
-                  vérifiez toujours auprès de nos agences ou du site officiel.
+                  {ASSISTANT_NAME} est un assistant automatisé qui peut ne pas répondre à toutes vos questions.
+                  Pour toute information sensible (paiement, réservation, réclamation), vérifiez toujours auprès
+                  de nos agences ou du site officiel.
                 </div>
               </div>
               <div className="mt-4">
