@@ -4,6 +4,8 @@
 
 body {
   font-family: 'Inter', sans-serif;
+  background-color: #FAF8FC;
+  color: #180B24;
 }
 
 @keyframes gradient-flow {
@@ -43,4 +45,52 @@ body {
 
 .animate-pop-in {
   animation: pop-in 0.3s ease-out both;
+}
+
+@keyframes scale-in {
+  from { opacity: 0; transform: scale(0.96) translateY(4px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to { background-position: 200% 0; }
+}
+
+/* The route-line signature: a small dot travelling along a dashed line,
+   used sparingly as the app's one recurring motif — a nod to a live bus
+   route tracker rather than a generic loading spinner. */
+@keyframes route-travel {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.animate-scale-in {
+  animation: scale-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-toast-in {
+  animation: toast-in 0.25s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #F1EDF7 25%, #E4DCF2 37%, #F1EDF7 63%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.animate-route-travel {
+  animation: route-travel 1.8s ease-in-out infinite;
+}
+
+.font-tabular {
+  font-family: 'IBM Plex Mono', monospace;
+  font-variant-numeric: tabular-nums;
 }

@@ -20,6 +20,8 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../lib/api';
+import { StatCard } from '../components/ui/StatCard';
+import { SkeletonGrid } from '../components/ui/Skeleton';
 import type {
   Agency,
   AuditLogEntry,
@@ -109,6 +111,7 @@ const quickActions = [
 export default function Dashboard() {
   const { admin } = useAuth();
   const [counts, setCounts] = useState<Counts>(EMPTY_COUNTS);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [pending, setPending] = useState({ messages: 0, suggestions: 0, testimonials: 0 });
   const [activity, setActivity] = useState<AuditLogEntry[]>([]);
   const [previewKey, setPreviewKey] = useState(0);
@@ -145,7 +148,8 @@ export default function Dashboard() {
           testimonials: testimonials.filter((t) => !t.approved).length,
         });
       })
-      .catch(() => {});
+      .catch(() => {})
+      .finally(() => setStatsLoading(false));
   }, []);
 
   useEffect(() => {
@@ -181,7 +185,7 @@ export default function Dashboard() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-black text-gray-900">
+          <h1 className="font-display text-2xl font-extrabold tracking-tight text-ink">
             {greeting}{firstName ? `, ${firstName}` : ''}
           </h1>
           <p className="text-sm text-gray-400">Voici l'état actuel du site Nagode Transfert.</p>
@@ -191,7 +195,7 @@ export default function Dashboard() {
             <Link
               key={to}
               to={to}
-              className="flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-3.5 py-2 text-xs font-bold text-gray-600 shadow-sm transition-colors hover:border-brand-primary hover:text-brand-primary"
+              className="flex items-center gap-2 rounded-xl border border-line bg-white px-3.5 py-2 text-xs font-bold text-gray-600 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:border-brand-primary hover:text-brand-primary hover:shadow-md"
             >
               <Plus size={14} />
               <Icon size={14} />
@@ -229,8 +233,8 @@ export default function Dashboard() {
                 </a>
               </div>
             </div>
-            <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-              <div className="flex items-center gap-2 border-b border-gray-100 bg-gray-50 px-4 py-2.5">
+            <div className="overflow-hidden rounded-2xl border border-line bg-white shadow-sm">
+              <div className="flex items-center gap-2 border-b border-line bg-surface px-4 py-2.5">
                 <span className="h-2.5 w-2.5 rounded-full bg-red-300" />
                 <span className="h-2.5 w-2.5 rounded-full bg-amber-300" />
                 <span className="h-2.5 w-2.5 rounded-full bg-green-300" />
@@ -257,21 +261,15 @@ export default function Dashboard() {
 
           <div>
             <p className="mb-3 text-xs font-black uppercase tracking-widest text-gray-400">Contenu publié</p>
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-              {statCards.map(({ label, value, icon: Icon, to }) => (
-                <Link
-                  key={label}
-                  to={to}
-                  className="rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-shadow hover:shadow-md"
-                >
-                  <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-lg bg-brand-primary/10 text-brand-primary">
-                    <Icon size={16} />
-                  </div>
-                  <p className="text-xl font-black text-gray-900">{value}</p>
-                  <p className="text-[11px] text-gray-400">{label}</p>
-                </Link>
-              ))}
-            </div>
+            {statsLoading ? (
+              <SkeletonGrid count={statCards.length} />
+            ) : (
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+                {statCards.map(({ label, value, icon: Icon, to }, i) => (
+                  <StatCard key={label} label={label} value={value} icon={Icon} to={to} delay={i * 40} />
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -285,20 +283,20 @@ export default function Dashboard() {
                   <Link
                     key={item.to}
                     to={item.to}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 p-3.5 shadow-sm transition-shadow hover:shadow-md"
+                    className="flex items-center justify-between gap-3 rounded-xl border border-warning/25 bg-warning-soft p-3.5 shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:shadow-md"
                   >
-                    <span className="flex items-center gap-2.5 text-sm font-semibold text-gray-700">
-                      <item.icon size={16} className="text-amber-600" />
+                    <span className="flex items-center gap-2.5 text-sm font-semibold text-ink">
+                      <item.icon size={16} className="text-warning" />
                       {item.label}
                     </span>
-                    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-amber-500 px-1.5 text-xs font-black text-white">
+                    <span className="flex h-6 min-w-6 items-center justify-center rounded-full bg-warning px-1.5 text-xs font-black text-white">
                       {item.count}
                     </span>
                   </Link>
                 ))}
               </div>
             ) : (
-              <div className="flex items-center gap-3 rounded-xl border border-green-200 bg-green-50 px-4 py-3.5 text-sm font-semibold text-green-700">
+              <div className="flex items-center gap-3 rounded-xl border border-success/25 bg-success-soft px-4 py-3.5 text-sm font-semibold text-success">
                 <CheckCircle2 size={18} />
                 Tout est à jour.
               </div>
@@ -313,17 +311,17 @@ export default function Dashboard() {
                   Tout voir
                 </Link>
               </div>
-              <div className="rounded-2xl border border-gray-100 bg-white shadow-sm">
+              <div className="rounded-2xl border border-line bg-white shadow-sm">
                 {activity.length > 0 ? (
-                  <ul className="divide-y divide-gray-50">
+                  <ul className="divide-y divide-line/70">
                     {activity.map((entry) => (
                       <li key={entry.id} className="flex items-start gap-3 px-4 py-3">
-                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gray-100 text-gray-400">
+                        <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-brand-primary/10 text-brand-primary">
                           <History size={13} />
                         </div>
                         <div className="min-w-0">
                           <p className="text-xs leading-relaxed text-gray-600">
-                            <span className="font-bold text-gray-900">{entry.adminEmail.split('@')[0]}</span>{' '}
+                            <span className="font-bold text-ink">{entry.adminEmail.split('@')[0]}</span>{' '}
                             {STANDALONE_ACTION_LABEL[entry.action] ?? (
                               <>
                                 {ACTION_LABEL[entry.action] ?? entry.action.toLowerCase()}{' '}

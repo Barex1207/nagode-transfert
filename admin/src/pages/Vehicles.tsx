@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Loader2, Pencil, Plus, Search, Trash2 } from 'lucide-react';
+import { Bus, Pencil, Plus, Search, Trash2 } from 'lucide-react';
 import { useResource } from '../lib/useResource';
 import type { Vehicle, VehicleStatus } from '../types';
 import { Button } from '../components/ui/Button';
@@ -8,6 +8,9 @@ import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { DraggableList } from '../components/ui/DraggableList';
 import { Field, Input, Select, Textarea } from '../components/ui/Field';
 import { ImageUpload } from '../components/ui/ImageUpload';
+import { PageHeader } from '../components/ui/PageHeader';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Skeleton } from '../components/ui/Skeleton';
 import { ApiError } from '../lib/api';
 
 const STATUS_LABEL: Record<VehicleStatus, string> = {
@@ -99,13 +102,23 @@ export default function Vehicles() {
 
   function renderCard(vehicle: Vehicle) {
     return (
-      <div className="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
-        <div className="h-36 bg-gray-100">
-          {vehicle.imageUrl && <img src={vehicle.imageUrl} alt={vehicle.name} className="h-full w-full object-cover" />}
+      <div className="group overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+        <div className="h-36 overflow-hidden bg-surface">
+          {vehicle.imageUrl ? (
+            <img
+              src={vehicle.imageUrl}
+              alt={vehicle.name}
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-gray-300">
+              <Bus size={28} />
+            </div>
+          )}
         </div>
         <div className="p-4">
           <div className="mb-1 flex items-start justify-between gap-2">
-            <h3 className="font-bold text-gray-900">{vehicle.name}</h3>
+            <h3 className="font-display font-bold text-ink">{vehicle.name}</h3>
             <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_BADGE[vehicle.status]}`}>
               {STATUS_LABEL[vehicle.status]}
             </span>
@@ -129,16 +142,16 @@ export default function Vehicles() {
 
   return (
     <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-black text-gray-900">Flotte / Véhicules</h1>
-          <p className="text-sm text-gray-400">Gérez les bus affichés sur la landing page. Glissez une carte pour réordonner.</p>
-        </div>
-        <Button onClick={openCreate}>
-          <Plus size={16} />
-          Ajouter un véhicule
-        </Button>
-      </div>
+      <PageHeader
+        title="Flotte / Véhicules"
+        subtitle="Gérez les bus affichés sur la landing page. Glissez une carte pour réordonner."
+        action={
+          <Button onClick={openCreate}>
+            <Plus size={16} />
+            Ajouter un véhicule
+          </Button>
+        }
+      />
 
       <div className="mb-6 relative max-w-sm">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
@@ -146,14 +159,33 @@ export default function Vehicles() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="Rechercher un véhicule..."
-          className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary"
+          className="w-full rounded-xl border border-line bg-white py-2.5 pl-9 pr-3 text-sm outline-none transition-all focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10"
         />
       </div>
 
-      {loading && <Loader2 className="animate-spin text-brand-primary" />}
-      {error && <p className="text-red-600">{error}</p>}
+      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
 
-      {searchQuery ? (
+      {loading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <Skeleton key={i} className="h-64 rounded-2xl" />
+          ))}
+        </div>
+      ) : filtered.length === 0 ? (
+        <EmptyState
+          icon={Bus}
+          title={searchQuery ? 'Aucun véhicule ne correspond' : 'Aucun véhicule pour le moment'}
+          message={searchQuery ? 'Essayez un autre nom ou modèle.' : 'Ajoutez votre premier bus pour l’afficher sur le site.'}
+          action={
+            !searchQuery && (
+              <Button onClick={openCreate}>
+                <Plus size={16} />
+                Ajouter un véhicule
+              </Button>
+            )
+          }
+        />
+      ) : searchQuery ? (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((vehicle) => (
             <div key={vehicle.id}>{renderCard(vehicle)}</div>
@@ -166,10 +198,6 @@ export default function Vehicles() {
           className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
           renderItem={renderCard}
         />
-      )}
-
-      {!loading && filtered.length === 0 && (
-        <p className="mt-8 text-center text-sm text-gray-400">Aucun véhicule trouvé.</p>
       )}
 
       {formOpen && (

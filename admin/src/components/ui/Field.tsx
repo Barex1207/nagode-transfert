@@ -4,20 +4,22 @@ interface FieldProps {
   label: string;
   children: React.ReactNode;
   error?: string;
+  hint?: string;
 }
 
-export function Field({ label, children, error }: FieldProps) {
+export function Field({ label, children, error, hint }: FieldProps) {
   return (
     <label className="block mb-4">
-      <span className="block text-sm font-semibold text-gray-700 mb-1">{label}</span>
+      <span className="mb-1.5 block text-sm font-semibold text-ink">{label}</span>
       {children}
-      {error && <span className="block text-sm text-red-600 mt-1">{error}</span>}
+      {hint && !error && <span className="mt-1 block text-xs text-gray-400">{hint}</span>}
+      {error && <span className="mt-1 block text-xs font-medium text-red-600">{error}</span>}
     </label>
   );
 }
 
 const baseInputClass =
-  'w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent';
+  'w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-sm text-ink placeholder-gray-400 outline-none transition-all duration-150 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10';
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <input {...props} className={`${baseInputClass} ${props.className ?? ''}`} />;

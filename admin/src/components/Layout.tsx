@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   Bus,
   Building2,
@@ -94,6 +94,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
   const [badges, setBadges] = useState<Record<BadgeKey, number>>({ suggestions: 0, contact: 0, testimonials: 0 });
   const [profileOpen, setProfileOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     Promise.all([
@@ -126,42 +127,57 @@ export function Layout({ children }: { children: React.ReactNode }) {
         end={end}
         onClick={() => setMobileNavOpen(false)}
         className={({ isActive }) =>
-          `flex items-center justify-between gap-3 rounded-lg px-3 py-2.5 text-sm font-semibold transition-colors ${
-            isActive ? 'bg-brand-dark text-white' : 'text-gray-600 hover:bg-gray-100'
+          `group relative flex items-center justify-between gap-3 rounded-xl py-2.5 pr-3 pl-4 text-sm font-semibold transition-all duration-150 ${
+            isActive
+              ? 'bg-brand-dark text-white shadow-sm shadow-brand-dark/25'
+              : 'text-gray-500 hover:bg-brand-primary/5 hover:text-ink'
           }`
         }
       >
-        <span className="flex items-center gap-3">
-          <Icon size={18} />
-          {label}
-        </span>
-        {count > 0 && (
-          <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-black text-white">
-            {count}
-          </span>
+        {({ isActive }) => (
+          <>
+            {isActive && (
+              <span className="absolute left-1.5 top-1/2 h-1.5 w-1.5 -translate-y-1/2 animate-pop-in rounded-full bg-white" />
+            )}
+            <span className="flex items-center gap-3">
+              <Icon size={18} />
+              {label}
+            </span>
+            {count > 0 && (
+              <span
+                className={`flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[10px] font-black ${
+                  isActive ? 'bg-white text-brand-dark' : 'bg-red-500 text-white'
+                }`}
+              >
+                {count}
+              </span>
+            )}
+          </>
         )}
       </NavLink>
     );
   }
 
   return (
-    <div className="flex min-h-screen bg-brand-light lg:overflow-hidden">
+    <div className="flex min-h-screen bg-surface lg:overflow-hidden">
       {mobileNavOpen && (
         <div className="fixed inset-0 z-40 bg-black/40 lg:hidden" onClick={() => setMobileNavOpen(false)} />
       )}
 
       <aside
-        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-shrink-0 transform flex-col border-r border-gray-200 bg-white transition-transform duration-300 ease-out lg:static lg:z-auto lg:w-64 lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-shrink-0 transform flex-col border-r border-line bg-white transition-transform duration-300 ease-out lg:static lg:z-auto lg:w-64 lg:translate-x-0 ${
           mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <div className="flex items-center justify-between gap-3 px-6 py-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-gray-100">
+            <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-full bg-white shadow-sm ring-1 ring-line">
               <img src={branding.logoUrl} alt={branding.siteName} className="h-full w-full object-contain p-0.5" />
             </div>
             <div>
-              <p className="text-lg font-black uppercase leading-tight tracking-tight text-brand-dark">Nagode</p>
+              <p className="font-display text-lg font-extrabold uppercase leading-tight tracking-tight text-brand-dark">
+                Nagode
+              </p>
               <p className="text-xs font-medium text-gray-400">Espace Administrateur</p>
             </div>
           </div>
@@ -173,7 +189,8 @@ export function Layout({ children }: { children: React.ReactNode }) {
             <X size={20} />
           </button>
         </div>
-        <nav className="flex-1 space-y-5 overflow-y-auto px-3 pb-4">
+        <nav className="relative flex-1 space-y-5 overflow-y-auto px-3 pb-4">
+          <div aria-hidden className="pointer-events-none absolute bottom-4 left-[19px] top-1 w-px border-l border-dashed border-line" />
           <div className="space-y-1">{renderLink(dashboardLink)}</div>
           {groups.map((group) => {
             const visibleLinks = group.links.filter((l) => !l.roleOnly || admin?.role === l.roleOnly);
@@ -189,7 +206,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </aside>
 
       <div className="flex min-w-0 flex-1 flex-col lg:overflow-hidden">
-        <header className="flex items-center justify-between gap-3 border-b border-gray-200 bg-white px-4 py-3 sm:px-8">
+        <header className="flex items-center justify-between gap-3 border-b border-line bg-white/80 px-4 py-3 backdrop-blur-sm sm:px-8">
           <button
             onClick={() => setMobileNavOpen(true)}
             aria-label="Ouvrir le menu"
@@ -235,7 +252,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
             )}
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div key={location.pathname} className="animate-fade-in-up" style={{ animationDuration: '0.35s' }}>
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   );
