@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, useSearchParams } from 'react-router-dom';
 import { Check, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { ApiError } from '../lib/api';
@@ -10,11 +10,13 @@ type Status = 'idle' | 'submitting' | 'success' | 'error';
 export default function Login() {
   const { admin, loading, login } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const branding = useBranding();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<Status>('idle');
+  const idleNotice = searchParams.get('raison') === 'inactivite';
 
   if (!loading && admin) return <Navigate to="/" replace />;
 
@@ -78,6 +80,12 @@ export default function Login() {
             className="w-full rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none transition-all focus:border-white/50 focus:bg-white/20"
           />
         </label>
+
+        {idleNotice && !error && (
+          <p className="mb-4 rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-sm text-white/80" role="status">
+            Session expirée après une période d'inactivité. Reconnectez-vous.
+          </p>
+        )}
 
         {error && (
           <p className="mb-4 rounded-lg border border-red-400/30 bg-red-500/20 px-3 py-2 text-sm text-red-100" role="alert">
