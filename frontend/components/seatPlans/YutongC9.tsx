@@ -1,11 +1,15 @@
 import React from 'react';
 import { Frame, Row2x2, Seat, SIDE_MARGIN, TOP_MARGIN, SEAT_H, ROW_GAP, rowY, width2x2 } from './SeatPlanBase';
 
-// Indicative layout for a 37-seat configuration of the Yutong C9 (9m coach):
-// a single seat near the front door (a common arrangement on coaches this
-// size) followed by nine 2+2 rows (36 seats). Not an official Yutong cabin
-// diagram — Yutong does not publish a seat-by-seat plan for this model.
+// Layout for the Yutong C9 (9m coach): 37 passenger seats in a straight 2+2
+// configuration (nine full rows = 36 seats) plus one extra seat in a
+// slightly widened rear row, matching the "rangée arrière élargie" seen on
+// the owner's on-site seating sketch. Two separate crew seats (driver +
+// second crew member) sit at the front, apart from the 37 passenger seats,
+// behind a single front door. Reconstructed from the sketch and the owner's
+// description, not an official Yutong cabin diagram.
 const COACH_ROWS = 9;
+const REAR_EXTRA_ROW = COACH_ROWS;
 const TOTAL_ROW_SLOTS = COACH_ROWS + 1;
 
 const YutongC9: React.FC = () => {
@@ -14,11 +18,11 @@ const YutongC9: React.FC = () => {
   const doorX = width - SIDE_MARGIN - 30;
 
   return (
-    <Frame width={width} height={height} frontDoorX={doorX}>
-      <Seat x={SIDE_MARGIN} y={rowY(0)} label="0A" />
+    <Frame width={width} height={height} frontDoorX={doorX} driverSide="left" crewSide="right">
       {Array.from({ length: COACH_ROWS }).map((_, i) => (
-        <Row2x2 key={i} row={i + 1} rowLabel={String(i + 1)} />
+        <Row2x2 key={i} row={i} rowLabel={String(i + 1)} />
       ))}
+      <Seat x={SIDE_MARGIN} y={rowY(REAR_EXTRA_ROW)} label={`${REAR_EXTRA_ROW + 1}A`} />
     </Frame>
   );
 };

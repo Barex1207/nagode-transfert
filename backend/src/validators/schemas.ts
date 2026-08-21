@@ -26,12 +26,14 @@ export const VEHICLE_AMENITY_KEYS = [
   'ECRAN',
   'BAGAGES',
   'COLLATION',
+  'ECLAIRAGE_LED',
 ] as const;
 
 export const VEHICLE_SEAT_PLAN_KEYS = [
   'yutong_c9',
   'yutong_d7',
   'yutong_c12pro_standard',
+  'yutong_c12pro_standard_led',
   'yutong_c12pro_prestige',
   'yutong_v6',
 ] as const;
@@ -49,6 +51,7 @@ export const vehicleSchema = z.object({
   amenities: z.array(z.enum(VEHICLE_AMENITY_KEYS)).optional().default([]),
   routes: z.array(z.string().min(1).max(120)).max(20).optional().default([]),
   seatPlanKey: z.enum(VEHICLE_SEAT_PLAN_KEYS).nullable().optional(),
+  seatPlanImageUrl: z.string().url().nullable().optional(),
   order: z.coerce.number().int().optional().default(0),
 });
 
@@ -85,7 +88,7 @@ export const settingsSchema = z.object({
   secondaryColor: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
   phone: z.string().max(30).optional(),
   whatsapp: z.string().max(30).nullable().optional(),
-  email: z.string().email().optional(),
+  email: z.union([z.string().email(), z.literal('')]).optional(),
   address: z.string().max(300).optional(),
   facebookUrl: z.string().url().nullable().optional(),
   instagramUrl: z.string().url().nullable().optional(),

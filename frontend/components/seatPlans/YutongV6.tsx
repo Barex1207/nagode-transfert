@@ -1,20 +1,25 @@
 import React from 'react';
-import { Frame, Row2x1, TOP_MARGIN, SEAT_H, ROW_GAP, width2x1, SIDE_MARGIN } from './SeatPlanBase';
+import { DoorMarker, Frame, Row1x1, TOP_MARGIN, SEAT_H, ROW_GAP, width1x1, SIDE_MARGIN } from './SeatPlanBase';
 
-// Indicative layout for a 15-seat configuration of the Yutong V6 (minivan):
-// five 2+1 rows, matching Yutong's published "14/15 seats" spec for this
-// model. Not an official Yutong cabin diagram.
-const ROWS = 5;
+// Layout for the Yutong V6 minivan: 14 individual "captain's chair" passenger
+// seats (one on each side of the aisle, 7 rows) and two doors both at the
+// front, close together — matching the owner's on-site seating sketch and
+// confirmed seat count (corrected from an earlier, less accurate 15/one-door
+// estimate). Reconstructed from the sketch and the owner's description, not
+// an official Yutong cabin diagram.
+const ROWS = 7;
 
 const YutongV6: React.FC = () => {
-  const width = width2x1();
+  const width = width1x1();
   const height = TOP_MARGIN + ROWS * (SEAT_H + ROW_GAP) + 24;
-  const doorX = width - SIDE_MARGIN - 30;
+  const door1X = width - SIDE_MARGIN - 30;
+  const door2X = door1X - 34;
 
   return (
-    <Frame width={width} height={height} frontDoorX={doorX}>
+    <Frame width={width} height={height} frontDoorX={door1X} driverSide="right">
+      <DoorMarker x={door2X} y={44} />
       {Array.from({ length: ROWS }).map((_, i) => (
-        <Row2x1 key={i} row={i} rowLabel={String(i + 1)} />
+        <Row1x1 key={i} row={i} rowLabel={String(i + 1)} />
       ))}
     </Frame>
   );

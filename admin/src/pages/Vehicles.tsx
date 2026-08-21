@@ -3,6 +3,7 @@ import {
   Armchair,
   Bus,
   Coffee,
+  Lightbulb,
   Luggage,
   Pencil,
   Plus,
@@ -22,6 +23,7 @@ import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { DraggableList } from '../components/ui/DraggableList';
 import { Field, Input, Select, Textarea } from '../components/ui/Field';
+import { ImageUpload } from '../components/ui/ImageUpload';
 import { MultiImageUpload } from '../components/ui/MultiImageUpload';
 import { TagListInput } from '../components/ui/TagListInput';
 import { PageHeader } from '../components/ui/PageHeader';
@@ -57,6 +59,7 @@ export const AMENITY_LABEL: Record<VehicleAmenity, string> = {
   ECRAN: 'Écran individuel par siège',
   BAGAGES: 'Grand espace bagages',
   COLLATION: 'Restauration à bord',
+  ECLAIRAGE_LED: 'Éclairage LED d’ambiance',
 };
 
 export const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: number }>> = {
@@ -68,6 +71,7 @@ export const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: n
   ECRAN: Tv,
   BAGAGES: Luggage,
   COLLATION: Coffee,
+  ECLAIRAGE_LED: Lightbulb,
 };
 
 const AMENITY_KEYS = Object.keys(AMENITY_LABEL) as VehicleAmenity[];
@@ -75,7 +79,8 @@ const AMENITY_KEYS = Object.keys(AMENITY_LABEL) as VehicleAmenity[];
 const SEAT_PLAN_LABEL: Record<VehicleSeatPlanKey, string> = {
   yutong_c9: 'Yutong C9',
   yutong_d7: 'Yutong D7',
-  yutong_c12pro_standard: 'Yutong C12 Pro (Standard)',
+  yutong_c12pro_standard: 'Yutong C12 Pro Standard — châssis ZK6120D1 (sans LED, 51 places)',
+  yutong_c12pro_standard_led: 'Yutong C12 Pro Standard — châssis ZK6129D (avec LED, 52 places)',
   yutong_c12pro_prestige: 'Yutong C12 Pro (Prestige)',
   yutong_v6: 'Yutong V6',
 };
@@ -95,6 +100,7 @@ const emptyForm: FormState = {
   amenities: [],
   routes: [],
   seatPlanKey: null,
+  seatPlanImageUrl: null,
   order: 0,
 };
 
@@ -370,19 +376,30 @@ export default function Vehicles() {
             </div>
 
             {!isCargoForm && (
-              <Field label="Plan des sièges" hint="Détermine le plan affiché sur la page Notre Flotte.">
-                <Select
-                  value={form.seatPlanKey ?? ''}
-                  onChange={(e) => setForm((f) => ({ ...f, seatPlanKey: (e.target.value || null) as VehicleSeatPlanKey | null }))}
+              <>
+                <Field label="Plan des sièges" hint="Modèle de plan schématique généré. Ignoré si une image de plan est ajoutée ci-dessous.">
+                  <Select
+                    value={form.seatPlanKey ?? ''}
+                    onChange={(e) => setForm((f) => ({ ...f, seatPlanKey: (e.target.value || null) as VehicleSeatPlanKey | null }))}
+                  >
+                    <option value="">Aucun plan</option>
+                    {Object.entries(SEAT_PLAN_LABEL).map(([value, label]) => (
+                      <option key={value} value={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </Select>
+                </Field>
+                <Field
+                  label="Plan des sièges (image)"
+                  hint="Facultatif. Ajoutez une photo ou un plan réel du véhicule : il remplacera le plan schématique ci-dessus sur la page Notre Flotte."
                 >
-                  <option value="">Aucun plan</option>
-                  {Object.entries(SEAT_PLAN_LABEL).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
+                  <ImageUpload
+                    value={form.seatPlanImageUrl}
+                    onChange={(url) => setForm((f) => ({ ...f, seatPlanImageUrl: url }))}
+                  />
+                </Field>
+              </>
             )}
 
             <Field label="Équipements à bord">

@@ -35,14 +35,24 @@ function pinIcon(): L.DivIcon {
   });
 }
 
+// A country like Togo is very tall and narrow (~4° of latitude for ~0.6° of
+// longitude), so a plain fitBounds on a wide, short map container has to
+// zoom out far enough to fit the height — which then reveals a huge, mostly
+// irrelevant east-west sliver reaching into Nigeria and Niger. Flooring the
+// zoom keeps the view regionally sensible; a couple of extreme agencies can
+// end up just outside the initial frame, but the map stays draggable.
+const MIN_ZOOM_MULTI = 8;
+
 const FitBounds: React.FC<{ points: [number, number][] }> = ({ points }) => {
   const map = useMap();
   useEffect(() => {
     if (points.length === 0) return;
     if (points.length === 1) {
-      map.setView(points[0], 9);
+      map.setView(points[0], 9, { animate: false });
     } else {
-      map.fitBounds(points, { padding: [32, 32] });
+      const bounds = L.latLngBounds(points);
+      const fittedZoom = map.getBoundsZoom(bounds, false, L.point(32, 32));
+      map.setView(bounds.getCenter(), Math.max(fittedZoom, MIN_ZOOM_MULTI), { animate: false });
     }
   }, [map, points]);
   return null;

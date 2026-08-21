@@ -8,11 +8,13 @@ export type VehicleAmenity =
   | 'TOILETTES'
   | 'ECRAN'
   | 'BAGAGES'
-  | 'COLLATION';
+  | 'COLLATION'
+  | 'ECLAIRAGE_LED';
 export type VehicleSeatPlanKey =
   | 'yutong_c9'
   | 'yutong_d7'
   | 'yutong_c12pro_standard'
+  | 'yutong_c12pro_standard_led'
   | 'yutong_c12pro_prestige'
   | 'yutong_v6';
 
@@ -30,6 +32,7 @@ export interface Vehicle {
   amenities: VehicleAmenity[];
   routes: string[];
   seatPlanKey: VehicleSeatPlanKey | null;
+  seatPlanImageUrl: string | null;
   order: number;
   createdAt: string;
   updatedAt: string;

@@ -7,6 +7,7 @@ import {
   ChevronRight,
   Coffee,
   LayoutGrid,
+  Lightbulb,
   Luggage,
   MapPin,
   Snowflake,
@@ -27,7 +28,8 @@ type VehicleAmenity =
   | 'TOILETTES'
   | 'ECRAN'
   | 'BAGAGES'
-  | 'COLLATION';
+  | 'COLLATION'
+  | 'ECLAIRAGE_LED';
 
 export interface FlotteVehicle {
   id: string;
@@ -42,6 +44,7 @@ export interface FlotteVehicle {
   amenities: VehicleAmenity[];
   routes: string[];
   seatPlanKey: SeatPlanKey | null;
+  seatPlanImageUrl: string | null;
 }
 
 const AMENITY_LABEL: Record<VehicleAmenity, string> = {
@@ -53,6 +56,7 @@ const AMENITY_LABEL: Record<VehicleAmenity, string> = {
   ECRAN: 'Écran individuel par siège',
   BAGAGES: 'Grand espace bagages',
   COLLATION: 'Restauration à bord',
+  ECLAIRAGE_LED: 'Éclairage LED d’ambiance',
 };
 
 const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: number }>> = {
@@ -64,6 +68,7 @@ const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: number }
   ECRAN: Tv,
   BAGAGES: Luggage,
   COLLATION: Coffee,
+  ECLAIRAGE_LED: Lightbulb,
 };
 
 const Gallery: React.FC<{ images: string[]; alt: string; isCargo: boolean }> = ({ images, alt, isCargo }) => {
@@ -196,7 +201,7 @@ const VehicleDetailCard: React.FC<{ vehicle: FlotteVehicle; defaultOpen?: boolea
                 </div>
               )}
 
-              {!isCargo && vehicle.seatPlanKey && (
+              {!isCargo && (vehicle.seatPlanKey || vehicle.seatPlanImageUrl) && (
                 <button
                   onClick={() => setSeatPlanOpen(true)}
                   className="inline-flex items-center gap-2 rounded-xl border border-[var(--brand-dark)] px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[var(--brand-dark)] transition-colors hover:bg-[var(--brand-dark)] hover:text-white"
@@ -210,8 +215,13 @@ const VehicleDetailCard: React.FC<{ vehicle: FlotteVehicle; defaultOpen?: boolea
         </div>
       )}
 
-      {seatPlanOpen && vehicle.seatPlanKey && (
-        <SeatPlanModal seatPlanKey={vehicle.seatPlanKey} vehicleName={vehicle.name} onClose={() => setSeatPlanOpen(false)} />
+      {seatPlanOpen && (vehicle.seatPlanKey || vehicle.seatPlanImageUrl) && (
+        <SeatPlanModal
+          seatPlanKey={vehicle.seatPlanKey}
+          imageUrl={vehicle.seatPlanImageUrl}
+          vehicleName={vehicle.name}
+          onClose={() => setSeatPlanOpen(false)}
+        />
       )}
     </div>
   );

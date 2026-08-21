@@ -13,7 +13,8 @@ type VehicleAmenity =
   | 'TOILETTES'
   | 'ECRAN'
   | 'BAGAGES'
-  | 'COLLATION';
+  | 'COLLATION'
+  | 'ECLAIRAGE_LED';
 
 interface Vehicle {
   id: string;
