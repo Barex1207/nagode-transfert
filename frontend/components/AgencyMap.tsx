@@ -78,7 +78,7 @@ const AgencyMap: React.FC<{ agencies: Agency[] }> = ({ agencies }) => {
   }
 
   return (
-    <div className="mb-12 overflow-hidden rounded-3xl border border-gray-100 shadow-sm">
+    <div className="relative z-0 mb-12 overflow-hidden rounded-3xl border border-gray-100 shadow-sm">
       <MapContainer
         center={WEST_AFRICA_CENTER}
         zoom={6}
