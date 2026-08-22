@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, ChevronDown, Clock, Tag, Bus, X } from 'lucide-react';
+import { Menu, Clock, Tag, Bus, X } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -9,7 +9,6 @@ const navLinkClass = ({ isActive }: { isActive: boolean }) =>
   }`;
 
 const Navbar: React.FC = () => {
-  const [isVoyagerOpen, setIsVoyagerOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const settings = useSettings();
   const customLogo = settings.logoUrl ?? "https://nagodetransfert.com/wp-content/uploads/2023/03/FB_IMG_1679044436873-72x72.jpg";
@@ -36,39 +35,12 @@ const Navbar: React.FC = () => {
             <NavLink to="/" end className={navLinkClass}>
               Accueil
             </NavLink>
-
-            <div
-              className="relative group"
-              onMouseEnter={() => setIsVoyagerOpen(true)}
-              onMouseLeave={() => setIsVoyagerOpen(false)}
-            >
-              <button className="flex items-center gap-1 cursor-pointer hover:text-white/80 py-4 tracking-wide uppercase text-xs">
-                <span>Voyager</span>
-                <ChevronDown size={12} className={`transition-transform duration-200 ${isVoyagerOpen ? 'rotate-180' : ''}`} />
-              </button>
-
-              <div className={`absolute top-full left-1/2 -translate-x-1/2 w-56 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transform transition-all duration-300 origin-top ${isVoyagerOpen ? 'opacity-100 scale-100' : 'opacity-0 scale-95 pointer-events-none'}`}>
-                <div className="p-2">
-                  <Link
-                    to="/tarifs"
-                    onClick={() => setIsVoyagerOpen(false)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-brand-light rounded-lg transition-colors text-left"
-                  >
-                    <Tag size={16} className="text-[var(--brand-dark)]" />
-                    <span className="font-bold text-sm">Tarifs</span>
-                  </Link>
-                  <Link
-                    to="/horaires"
-                    onClick={() => setIsVoyagerOpen(false)}
-                    className="w-full flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-brand-light rounded-lg transition-colors text-left"
-                  >
-                    <Clock size={16} className="text-[var(--brand-dark)]" />
-                    <span className="font-bold text-sm">Horaires de départ</span>
-                  </Link>
-                </div>
-              </div>
-            </div>
-
+            <NavLink to="/tarifs" className={navLinkClass}>
+              Tarifs
+            </NavLink>
+            <NavLink to="/horaires" className={navLinkClass}>
+              Horaires
+            </NavLink>
             <NavLink to="/actualites" className={navLinkClass}>
               Actualités
             </NavLink>
@@ -103,28 +75,22 @@ const Navbar: React.FC = () => {
           <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
             Accueil
           </Link>
-
-          <div className="space-y-4">
-             <p className="text-[10px] font-black text-white/40 uppercase tracking-widest">Voyager</p>
-             <div className="space-y-4 pl-4 border-l-2 border-white/10">
-               <Link
-                to="/tarifs"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-lg font-bold hover:text-white/70 w-full text-left"
-               >
-                 <Tag size={18} />
-                 <span>Tarifs</span>
-               </Link>
-               <Link
-                to="/horaires"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 text-lg font-bold hover:text-white/70 w-full text-left"
-               >
-                 <Clock size={18} />
-                 <span>Horaires</span>
-               </Link>
-             </div>
-          </div>
+          <Link
+            to="/tarifs"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left"
+          >
+            <Tag size={20} />
+            <span>Tarifs</span>
+          </Link>
+          <Link
+            to="/horaires"
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left"
+          >
+            <Clock size={20} />
+            <span>Horaires</span>
+          </Link>
 
           <div className="space-y-6 pt-4 border-t border-white/5">
             <Link to="/actualites" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
