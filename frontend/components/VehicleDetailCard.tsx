@@ -18,7 +18,7 @@ import {
   Users,
   Wifi,
 } from 'lucide-react';
-import SeatPlanModal, { type SeatPlanKey } from './seatPlans/SeatPlanModal';
+import SeatPlanModal from './seatPlans/SeatPlanModal';
 
 type VehicleAmenity =
   | 'CLIMATISATION'
@@ -43,7 +43,6 @@ export interface FlotteVehicle {
   category: 'STANDARD' | 'VIP' | 'PRESTIGE' | 'CARGO';
   amenities: VehicleAmenity[];
   routes: string[];
-  seatPlanKey: SeatPlanKey | null;
   seatPlanImageUrl: string | null;
 }
 
@@ -201,7 +200,7 @@ const VehicleDetailCard: React.FC<{ vehicle: FlotteVehicle; defaultOpen?: boolea
                 </div>
               )}
 
-              {!isCargo && (vehicle.seatPlanKey || vehicle.seatPlanImageUrl) && (
+              {!isCargo && vehicle.seatPlanImageUrl && (
                 <button
                   onClick={() => setSeatPlanOpen(true)}
                   className="inline-flex items-center gap-2 rounded-xl border border-[var(--brand-dark)] px-4 py-2.5 text-xs font-black uppercase tracking-widest text-[var(--brand-dark)] transition-colors hover:bg-[var(--brand-dark)] hover:text-white"
@@ -215,13 +214,8 @@ const VehicleDetailCard: React.FC<{ vehicle: FlotteVehicle; defaultOpen?: boolea
         </div>
       )}
 
-      {seatPlanOpen && (vehicle.seatPlanKey || vehicle.seatPlanImageUrl) && (
-        <SeatPlanModal
-          seatPlanKey={vehicle.seatPlanKey}
-          imageUrl={vehicle.seatPlanImageUrl}
-          vehicleName={vehicle.name}
-          onClose={() => setSeatPlanOpen(false)}
-        />
+      {seatPlanOpen && vehicle.seatPlanImageUrl && (
+        <SeatPlanModal imageUrl={vehicle.seatPlanImageUrl} vehicleName={vehicle.name} onClose={() => setSeatPlanOpen(false)} />
       )}
     </div>
   );

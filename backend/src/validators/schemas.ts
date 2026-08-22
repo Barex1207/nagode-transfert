@@ -29,15 +29,6 @@ export const VEHICLE_AMENITY_KEYS = [
   'ECLAIRAGE_LED',
 ] as const;
 
-export const VEHICLE_SEAT_PLAN_KEYS = [
-  'yutong_c9',
-  'yutong_d7',
-  'yutong_c12pro_standard',
-  'yutong_c12pro_standard_led',
-  'yutong_c12pro_prestige',
-  'yutong_v6',
-] as const;
-
 export const vehicleSchema = z.object({
   name: z.string().min(1).max(120),
   model: z.string().min(1).max(120),
@@ -50,7 +41,6 @@ export const vehicleSchema = z.object({
   category: z.enum(['STANDARD', 'VIP', 'PRESTIGE', 'CARGO']).optional().default('STANDARD'),
   amenities: z.array(z.enum(VEHICLE_AMENITY_KEYS)).optional().default([]),
   routes: z.array(z.string().min(1).max(120)).max(20).optional().default([]),
-  seatPlanKey: z.enum(VEHICLE_SEAT_PLAN_KEYS).nullable().optional(),
   seatPlanImageUrl: z.string().url().nullable().optional(),
   order: z.coerce.number().int().optional().default(0),
 });

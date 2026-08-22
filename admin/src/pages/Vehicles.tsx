@@ -17,7 +17,7 @@ import {
   Wifi,
 } from 'lucide-react';
 import { useResource } from '../lib/useResource';
-import type { Vehicle, VehicleAmenity, VehicleCategory, VehicleSeatPlanKey, VehicleStatus } from '../types';
+import type { Vehicle, VehicleAmenity, VehicleCategory, VehicleStatus } from '../types';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -76,15 +76,6 @@ export const AMENITY_ICON: Record<VehicleAmenity, React.ComponentType<{ size?: n
 
 const AMENITY_KEYS = Object.keys(AMENITY_LABEL) as VehicleAmenity[];
 
-const SEAT_PLAN_LABEL: Record<VehicleSeatPlanKey, string> = {
-  yutong_c9: 'Yutong C9',
-  yutong_d7: 'Yutong D7',
-  yutong_c12pro_standard: 'Yutong C12 Pro Standard — châssis ZK6120D1 (sans LED, 51 places)',
-  yutong_c12pro_standard_led: 'Yutong C12 Pro Standard — châssis ZK6129D (avec LED, 52 places)',
-  yutong_c12pro_prestige: 'Yutong C12 Pro (Prestige)',
-  yutong_v6: 'Yutong V6',
-};
-
 type FormState = Omit<Vehicle, 'id' | 'createdAt' | 'updatedAt'>;
 
 const emptyForm: FormState = {
@@ -99,7 +90,6 @@ const emptyForm: FormState = {
   category: 'STANDARD',
   amenities: [],
   routes: [],
-  seatPlanKey: null,
   seatPlanImageUrl: null,
   order: 0,
 };
@@ -376,30 +366,15 @@ export default function Vehicles() {
             </div>
 
             {!isCargoForm && (
-              <>
-                <Field label="Plan des sièges" hint="Modèle de plan schématique généré. Ignoré si une image de plan est ajoutée ci-dessous.">
-                  <Select
-                    value={form.seatPlanKey ?? ''}
-                    onChange={(e) => setForm((f) => ({ ...f, seatPlanKey: (e.target.value || null) as VehicleSeatPlanKey | null }))}
-                  >
-                    <option value="">Aucun plan</option>
-                    {Object.entries(SEAT_PLAN_LABEL).map(([value, label]) => (
-                      <option key={value} value={value}>
-                        {label}
-                      </option>
-                    ))}
-                  </Select>
-                </Field>
-                <Field
-                  label="Plan des sièges (image)"
-                  hint="Facultatif. Ajoutez une photo ou un plan réel du véhicule : il remplacera le plan schématique ci-dessus sur la page Notre Flotte."
-                >
-                  <ImageUpload
-                    value={form.seatPlanImageUrl}
-                    onChange={(url) => setForm((f) => ({ ...f, seatPlanImageUrl: url }))}
-                  />
-                </Field>
-              </>
+              <Field
+                label="Plan des sièges (image)"
+                hint="Facultatif. Ajoutez une photo ou un plan du véhicule — il s'affiche sur la page Notre Flotte quand un visiteur clique sur « Voir le plan des sièges »."
+              >
+                <ImageUpload
+                  value={form.seatPlanImageUrl}
+                  onChange={(url) => setForm((f) => ({ ...f, seatPlanImageUrl: url }))}
+                />
+              </Field>
             )}
 
             <Field label="Équipements à bord">

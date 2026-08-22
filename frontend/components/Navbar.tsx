@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, NavLink } from 'react-router-dom';
-import { Menu, Clock, Tag, Bus, X } from 'lucide-react';
+import { Menu, X } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 
 const navLinkClass = ({ isActive }: { isActive: boolean }) =>
@@ -75,30 +75,19 @@ const Navbar: React.FC = () => {
           <Link to="/" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
             Accueil
           </Link>
-          <Link
-            to="/tarifs"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left"
-          >
-            <Tag size={20} />
-            <span>Tarifs</span>
+          <Link to="/tarifs" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
+            Tarifs
           </Link>
-          <Link
-            to="/horaires"
-            onClick={() => setIsMobileMenuOpen(false)}
-            className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left"
-          >
-            <Clock size={20} />
-            <span>Horaires</span>
+          <Link to="/horaires" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
+            Horaires
           </Link>
 
           <div className="space-y-6 pt-4 border-t border-white/5">
             <Link to="/actualites" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
               Actualités
             </Link>
-            <Link to="/flotte" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-xl font-bold hover:text-white/70 w-full text-left">
-              <Bus size={20} />
-              <span>Notre Flotte</span>
+            <Link to="/flotte" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
+              Notre Flotte
             </Link>
             <Link to="/agences" onClick={() => setIsMobileMenuOpen(false)} className="block text-xl font-bold hover:text-white/70 w-full text-left">
               Nos Agences

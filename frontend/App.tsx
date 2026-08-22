@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import SupportModal from './components/SupportModal';
 import StickyMobileCTA from './components/StickyMobileCTA';
 import ChatWidget from './components/ChatWidget';
+import CookieConsent from './components/CookieConsent';
 import Home from './pages/Home';
 import { ServiceTab } from './types';
 
@@ -69,6 +70,7 @@ const App: React.FC = () => {
       <SupportModal isOpen={isSupportModalOpen} onClose={() => setIsSupportModalOpen(false)} />
       <StickyMobileCTA />
       <ChatWidget />
+      <CookieConsent />
     </div>
   );
 };
